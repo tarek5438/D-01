@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار تفاعلي: أساسيات هياكل البيانات (Data Structures)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-dark: #0f172a;
+            --accent: #f59e0b;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 26px 20px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.25);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 1.7rem;
+            font-weight: 900;
+            margin-bottom: 6px;
+        }
+
+        header p {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            direction: ltr;
+        }
+
+        .stats-bar {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            display: block;
+        }
+
+        .stat-val {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .stat-val.high {
+            color: var(--accent);
+        }
+
+        .btn-index {
+            background: #eff6ff;
+            color: var(--primary);
+            border: 2px solid #bfdbfe;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-index:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.3s ease;
+        }
+
+        .q-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 10px 20px -3px rgba(0,0,0,0.06);
+            margin-bottom: 24px;
+        }
+
+        .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .q-badge {
+            background: #eff6ff;
+            color: var(--primary);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .q-text-ar {
+            font-size: 1.25rem;
+            font-weight: 800;
+            line-height: 1.8;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+
+        .q-text-en {
+            font-size: 1.02rem;
+            font-weight: 600;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #475569;
+            direction: ltr;
+            text-align: left;
+            font-family: 'Inter', sans-serif;
+            border-left: 3px solid var(--primary);
+            padding-left: 12px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .opt-btn {
+            background: #f8fafc;
+            border: 2px solid var(--border);
+            padding: 14px 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            text-align: right;
+        }
+
+        .opt-btn:hover:not(:disabled) {
+            background: #eff6ff;
+            border-color: #93c5fd;
+            transform: translateX(-4px);
+        }
+
+        .opt-btn.correct {
+            background: #dcfce7 !important;
+            border-color: var(--success) !important;
+        }
+
+        .opt-btn.wrong {
+            background: #fee2e2 !important;
+            border-color: var(--danger) !important;
+        }
+
+        .opt-ar {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .opt-en {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #64748b;
+            direction: ltr;
+            text-align: left;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .opt-btn.correct .opt-ar, .opt-btn.correct .opt-en {
+            color: #15803d !important;
+        }
+
+        .opt-btn.wrong .opt-ar, .opt-btn.wrong .opt-en {
+            color: #991b1b !important;
+        }
+
+        .explanation {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 0.98rem;
+            line-height: 1.7;
+            display: none;
+            background: #f1f5f9;
+            border-right: 5px solid var(--primary);
+        }
+
+        .exp-en {
+            direction: ltr;
+            text-align: left;
+            font-family: 'Inter', sans-serif;
+            color: #334155;
+            margin-top: 6px;
+            font-size: 0.92rem;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+        }
+
+        .btn-nav {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-nav:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-nav:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 680px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 26px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+            animation: popIn 0.25s ease;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .modal-header h3 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .close-btn {
+            background: #f1f5f9;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+        }
+
+        .legend {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+        }
+
+        .grid-index {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(55px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .index-pill {
+            background: #f8fafc;
+            border: 2px solid var(--border);
+            padding: 8px 2px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            color: #334155;
+        }
+
+        .index-pill:hover {
+            border-color: var(--primary);
+            background: #eff6ff;
+            transform: translateY(-2px);
+        }
+
+        .index-pill.active {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.25);
+            font-weight: 900;
+        }
+
+        .index-pill.solved-correct {
+            background: #dcfce7 !important;
+            border-color: #22c55e !important;
+            color: #15803d !important;
+        }
+
+        .index-pill.solved-wrong {
+            background: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #b91c1c !important;
+        }
+
+        .results-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .trophy {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .score-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: #eff6ff;
+            border: 6px solid var(--primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto;
+        }
+
+        .score-num {
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: var(--primary);
+        }
+
+        .btn-restart {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 14px 34px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 25px;
+            transition: 0.2s;
+        }
+
+        .btn-restart:hover {
+            transform: scale(1.03);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>اختبار شامل: أساسيات هياكل البيانات (50 سؤالاً)</h1>
+        <p>Comprehensive Data Structures Quiz: Primitives, Linear & Non-Linear Structures</p>
+    </header>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">رقم السؤال / Question</span>
+            <div><span class="stat-val" id="qCurrent">1</span> / 50</div>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">أول محاولة / 1st Score 🎯</span>
+            <span class="stat-val" style="color: #6366f1;" id="firstScore">--</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">الدرجة الحالية / Score</span>
+            <span class="stat-val" id="score">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">أعلى نتيجة / High Score 🏆</span>
+            <span class="stat-val high" id="highScore">0</span>
+        </div>
+        <div>
+            <button class="btn-index" onclick="openIndexModal()">
+                <span>📑</span>
+                <span>فهرس الأسئلة (1-50)</span>
+            </button>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <!-- Question Box -->
+    <div class="q-card" id="quizCard">
+        <div class="q-header">
+            <span class="q-badge" id="topicBadge">هياكل البيانات</span>
+            <span style="color: var(--text-muted); font-size: 0.9rem;" id="qStatusIndicator">لم يُجب بعد / Not answered</span>
+        </div>
+        
+        <div class="q-text-ar" id="questionTextAr">جاري تحميل السؤال...</div>
+        <div class="q-text-en" id="questionTextEn">Loading question...</div>
+
+        <div class="options-list" id="optionsContainer"></div>
+        
+        <div class="explanation" id="explanationText"></div>
+
+        <div class="actions">
+            <button class="btn-nav" id="prevBtn" onclick="prevQuestion()" disabled>➡️ السابق / Prev</button>
+            <button class="btn-nav" id="nextBtn" onclick="nextQuestion()">التالي / Next ⬅️</button>
+        </div>
+    </div>
+
+    <!-- Results Box -->
+    <div class="results-card" id="resultsCard">
+        <div class="trophy" id="trophyIcon">🎉</div>
+        <h2 id="resultMsg" style="font-size: 1.8rem; margin-bottom: 8px;">أحسنت صنعاً!</h2>
+        <p id="resultSubtitle" style="color: var(--text-muted);">You completed all 50 questions!</p>
+        
+        <div class="score-circle">
+            <div class="score-num" id="finalScore">0</div>
+            <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">/ 50</span>
+        </div>
+
+        <p id="highScoreNotice" style="font-weight: 700; font-size: 1.1rem; color: var(--accent); margin-top: 10px;"></p>
+
+        <button class="btn-restart" onclick="restartQuiz()">إعادة الاختبار من البداية 🔄</button>
+    </div>
+</div>
+
+<!-- Modal Index Window -->
+<div class="modal-overlay" id="indexModal" onclick="closeIndexModalOnOutside(event)">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>📑 فهرس الانتقال السريع لجميع الأسئلة (50)</h3>
+            <button class="close-btn" onclick="closeIndexModal()">✕</button>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background: #22c55e;"></div><span>إجابة صحيحة</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background: #ef4444;"></div><span>إجابة خاطئة</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background: #1e3a8a;"></div><span>السؤال المفتوح حالياً</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background: #e2e8f0; border: 1px solid #cbd5e1;"></div><span>لم يُحل بعد</span></div>
+        </div>
+
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">اضغط على أي رقم للمعاينة أو حل السؤال مباشرة دون قيود:</p>
+        
+        <div class="grid-index" id="gridIndexContainer"></div>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        // 1 - Topic: Primitive types
+        {
+            topic: "أنواع أولية / Primitives",
+            ar_q: "أي نوع من البيانات التالية يُعد من هياكل البيانات الأولية (Primitive)؟",
+            en_q: "Which of the following is considered a primitive data type?",
+            options: [
+                { ar: "شجرة البحث", en: "Search Tree" },
+                { ar: "العدد الصحيح", en: "Integer" },
+                { ar: "قائمة مترابطة", en: "Linked List" },
+                { ar: "جدول التجزئة", en: "Hash Table" }
+            ],
+            correct: 1, // B
+            exp_ar: "العدد الصحيح (Integer) نوع بيانات أولي مدمج في لغات البرمجة ويحفظ قيمة عددية واحدة.",
+            exp_en: "Integer is a built-in primitive data type that stores a single numeric value."
+        },
+        // 2 - Topic: Linear vs Non-Linear
+        {
+            topic: "تصنيف الهياكل / Classification",
+            ar_q: "ما هو المعيار الرئيسي الذي يميز هيكل البيانات الخطي (Linear)؟",
+            en_q: "What is the primary characteristic that defines a linear data structure?",
+            options: [
+                { ar: "ترتيب العناصر بالتتابع", en: "Sequential arrangement of items" },
+                { ar: "تفرع العناصر هرمياً", en: "Hierarchical branching of nodes" },
+                { ar: "استهلاك ذاكرة عشوائية", en: "Pure random memory storage" },
+                { ar: "حفظ المفاتيح فقط", en: "Storing only key elements" }
+            ],
+            correct: 0, // A
+            exp_ar: "في الهياكل الخطية تترتب العناصر بالتسلسل عنصراً وراء الآخر مثل المصفوفات والقوائم.",
+            exp_en: "In linear structures, elements are arranged sequentially one after the other."
+        },
+        // 3 - Topic: Arrays
+        {
+            topic: "المصفوفات / Arrays",
+            ar_q: "ما الذي يميز طريقة تخزين عناصر المصفوفة (Array) في الذاكرة؟",
+            en_q: "What characterizes how an array's elements are stored in memory?",
+            options: [
+                { ar: "تتوزع عشوائياً", en: "Scattered completely randomly" },
+                { ar: "ترتبط بدوال الهاش", en: "Linked exclusively by hash keys" },
+                { ar: "توضع في أماكن متجاورة", en: "Stored in contiguous memory" },
+                { ar: "تتصل بروابط ثنائية", en: "Connected via binary links" }
+            ],
+            correct: 2, // C
+            exp_ar: "عناصر المصفوفة تخزن في مواقع متجاورة ومتسلسلة في الذاكرة (Contiguous Memory).",
+            exp_en: "Array elements are allocated in contiguous blocks of memory."
+        },
+        // 4 - Topic: Arrays access
+        {
+            topic: "المصفوفات / Arrays",
+            ar_q: "ما هو التعقيد الزمني للوصول المباشر إلى أي عنصر في المصفوفة عبر الفهرس؟",
+            en_q: "What is the time complexity to directly access an array element via its index?",
+            options: [
+                { ar: "زمن خطي O(n)", en: "Linear time O(n)" },
+                { ar: "زمن لوغاريتمي O(log n)", en: "Logarithmic time O(log n)" },
+                { ar: "زمن تربيعي O(n²)", en: "Quadratic time O(n²)" },
+                { ar: "زمن ثابت O(1)", en: "Constant time O(1)" }
+            ],
+            correct: 3, // D
+            exp_ar: "بفضل معرفة موقع البداية وحجم كل عنصر، يتم احتساب عنوان العنصر والوصول إليه في زمن ثابت O(1).",
+            exp_en: "Array index lookup requires simple arithmetic, yielding O(1) constant access time."
+        },
+        // 5 - Topic: Stacks principle
+        {
+            topic: "المكدس / Stack",
+            ar_q: "ما هو المبدأ الأساسي الذي يعمل به هيكل المكدس (Stack)؟",
+            en_q: "Which fundamental principle governs the Stack data structure?",
+            options: [
+                { ar: "الداخل آخراً يخرج أولاً", en: "Last-In, First-Out (LIFO)" },
+                { ar: "الداخل أولاً يخرج أولاً", en: "First-In, First-Out (FIFO)" },
+                { ar: "الترتيب حسب الأولوية", en: "Highest priority gets served" },
+                { ar: "الوصول العشوائي المطلق", en: "Completely arbitrary access" }
+            ],
+            correct: 0, // A
+            exp_ar: "المكدس يعمل بمبدأ LIFO، أي أن آخر عنصر يضاف إلى القمة هو أول عنصر يتم حذفه.",
+            exp_en: "Stack operates on LIFO (Last-In, First-Out); the most recently pushed item is popped first."
+        },
+        // 6 - Topic: Stacks operations
+        {
+            topic: "المكدس / Stack",
+            ar_q: "ما اسم العملية المستخدمة لإضافة عنصر جديد إلى قمة المكدس؟",
+            en_q: "What is the standard operation used to insert an item onto a stack?",
+            options: [
+                { ar: "عملية الحذف pop", en: "Pop operation" },
+                { ar: "عملية الإدراج push", en: "Push operation" },
+                { ar: "عملية الرؤية peek", en: "Peek operation" },
+                { ar: "عملية الدوران rotate", en: "Rotate operation" }
+            ],
+            correct: 1, // B
+            exp_ar: "تسمى عملية إضافة عنصر لقمة المكدس بعملية push.",
+            exp_en: "The push operation adds a new element to the top of the stack."
+        },
+        // 7 - Topic: Queue principle
+        {
+            topic: "طابور الانتظار / Queue",
+            ar_q: "ما هو المبدأ التنظيمي الذي يعتمد عليه طابور الانتظار (Queue)؟",
+            en_q: "Which operating principle defines the standard Queue data structure?",
+            options: [
+                { ar: "الوصول من كلا الطرفين", en: "Access from both ends equally" },
+                { ar: "الداخل آخراً يخرج أولاً", en: "Last-In, First-Out (LIFO)" },
+                { ar: "الداخل أولاً يخرج أولاً", en: "First-In, First-Out (FIFO)" },
+                { ar: "الترتيب التنازلي التلقائي", en: "Automatic descending ordering" }
+            ],
+            correct: 2, // C
+            exp_ar: "طابور الانتظار يعمل بمبدأ FIFO، فأول عنصر يدخل الطابور هو أول عنصر يغادره.",
+            exp_en: "A queue follows FIFO (First-In, First-Out); first element added is served first."
+        },
+        // 8 - Topic: Queue operations
+        {
+            topic: "طابور الانتظار / Queue",
+            ar_q: "من أي جهة يتم حذف العنصر عند سحبه من طابور الانتظار العادي؟",
+            en_q: "From which end is an element removed in a standard queue?",
+            options: [
+                { ar: "من منتصف الطابور", en: "From the center" },
+                { ar: "من خلف الطابور (Rear)", en: "From the rear end" },
+                { ar: "من موضع عشوائي", en: "From an arbitrary index" },
+                { ar: "من مقدمة الطابور (Front)", en: "From the front end" }
+            ],
+            correct: 3, // D
+            exp_ar: "في الطابور العادي يتم سحب العناصر (Dequeue) من المقدمة (Front) والإضافة من الخلف (Rear).",
+            exp_en: "Removal in a standard queue takes place at the front."
+        },
+        // 9 - Topic: Linked Lists
+        {
+            topic: "القوائم المترابطة / Linked List",
+            ar_q: "ما هي المكونات الأساسية لكل عقدة (Node) في القائمة المترابطة الأحادية؟",
+            en_q: "What are the two basic parts of each node in a singly linked list?",
+            options: [
+                { ar: "البيانات ومؤشر التالي", en: "Data and next pointer" },
+                { ar: "المفتاح ودالة الهاش", en: "Key and hash algorithm" },
+                { ar: "الوزن والحافة المتجهة", en: "Weight and directed edge" },
+                { ar: "البيانات وجذر الشجرة", en: "Data and root reference" }
+            ],
+            correct: 0, // A
+            exp_ar: "تتكون كل عقدة من جزأين: القيمة أو البيانات (Data) ومؤشر (Pointer) يشير إلى العقدة التالية.",
+            exp_en: "A singly linked list node contains the payload data and a pointer to the next node."
+        },
+        // 10 - Topic: Linked Lists vs Arrays
+        {
+            topic: "القوائم المترابطة / Linked List",
+            ar_q: "ما هي الميزة الرئيسية للقائمة المترابطة مقارنة بالمصفوفة التقليدية؟",
+            en_q: "What is a key advantage of linked lists over standard fixed arrays?",
+            options: [
+                { ar: "سرعة الفهرسة المباشرة", en: "Instant direct indexing" },
+                { ar: "المرونة وتغيير الحجم بسهولة", en: "Dynamic resizing ease" },
+                { ar: "توفير كامل لاستهلاك الذاكرة", en: "Zero extra pointer memory" },
+                { ar: "ترتيب العناصر تلقائياً", en: "Automatic built-in sorting" }
+            ],
+            correct: 1, // B
+            exp_ar: "القوائم المترابطة ديناميكية الحجم؛ يمكن إضافة وحذف العقد دون الحاجة لحجز حجم ثابت مسبقاً.",
+            exp_en: "Linked lists are dynamic and can grow or shrink easily during runtime."
+        },
+        // 11 - Topic: Non-linear definition
+        {
+            topic: "هياكل غير خطية / Non-Linear",
+            ar_q: "أي من الهياكل التالية يُصنف كهيكل بيانات غير خطي (Non-Linear)؟",
+            en_q: "Which of the following data structures is categorized as non-linear?",
+            options: [
+                { ar: "المصفوفة الأحادية", en: "1D Array" },
+                { ar: "المكدس التسلسلي", en: "Linear Stack" },
+                { ar: "الشجرة الهرمية", en: "Hierarchical Tree" },
+                { ar: "طابور الانتظار", en: "Standard Queue" }
+            ],
+            correct: 2, // C
+            exp_ar: "الأشجار (Trees) هياكل غير خطية؛ لأن علاقات العناصر فيها هرمية وتتفرع لعدة مستويات.",
+            exp_en: "Trees are non-linear data structures because elements branch hierarchically."
+        },
+        // 12 - Topic: Tree Root
+        {
+            topic: "الأشجار / Trees",
+            ar_q: "ماذا يُطلق على العقدة العلوية التي يبدأ منها تفرع الشجرة ولا تملك أي أب؟",
+            en_q: "What is the topmost node of a tree called, having no parent node?",
+            options: [
+                { ar: "الورقة (Leaf)", en: "Leaf node" },
+                { ar: "الحافة (Edge)", en: "Edge reference" },
+                { ar: "العمق (Depth)", en: "Depth marker" },
+                { ar: "الجذر (Root)", en: "Root node" }
+            ],
+            correct: 3, // D
+            exp_ar: "الجذر (Root) هو رأس الشجرة والعقدة الأولى التي تنحدر منها سائر العقد.",
+            exp_en: "The root node is the very top node of the tree hierarchy without a parent."
+        },
+        // 13 - Topic: Tree Leaf
+        {
+            topic: "الأشجار / Trees",
+            ar_q: "ما هي العقدة الورقية (Leaf Node) في هيكل الشجرة؟",
+            en_q: "What is a leaf node in a tree data structure?",
+            options: [
+                { ar: "عقدة لا تمتلك أبناء", en: "A node with no children" },
+                { ar: "العقدة الرئيسية بالجذر", en: "The main root node" },
+                { ar: "عقدة تحتوي قيمتين فقط", en: "A node storing two keys" },
+                { ar: "العقدة الأكثر عمقاً فقط", en: "The lowest single node" }
+            ],
+            correct: 0, // A
+            exp_ar: "العقدة الورقية (Leaf) هي أي عقدة تقع عند أطراف الشجرة وليس لها أي عقد فرعية تابعة لها.",
+            exp_en: "A leaf node is any node that does not have any child nodes."
+        },
+        // 14 - Topic: Binary Tree
+        {
+            topic: "الأشجار / Trees",
+            ar_q: "كم أقصى عدد من الأبناء يمكن أن تمتلكه أي عقدة في الشجرة الثنائية (Binary Tree)؟",
+            en_q: "What is the maximum number of children a node can have in a binary tree?",
+            options: [
+                { ar: "ابن واحد فقط", en: "Only 1 child" },
+                { ar: "ابنان اثنان", en: "At most 2 children" },
+                { ar: "ثلاثة أبناء", en: "Up to 3 children" },
+                { ar: "عدد غير محدود", en: "Unbounded children" }
+            ],
+            correct: 1, // B
+            exp_ar: "في الشجرة الثنائية، كل عقدة تمتلك على الأكثر اثنين من الأبناء (الابن الأيسر والأيمن).",
+            exp_en: "In a binary tree, each node can have at most two children (left and right)."
+        },
+        // 15 - Topic: Graphs definition
+        {
+            topic: "الرسوم البيانية / Graphs",
+            ar_q: "يتكون الرسم البياني (Graph) من عنصرين رئيسيين هما:",
+            en_q: "A Graph data structure consists of two main components:",
+            options: [
+                { ar: "المفاتيح والقيم", en: "Keys and values" },
+                { ar: "المؤشرات والأعداد", en: "Pointers and scalars" },
+                { ar: "الرؤوس والحواف", en: "Vertices and edges" },
+                { ar: "الجذور والأوراق", en: "Roots and leaves" }
+            ],
+            correct: 2, // C
+            exp_ar: "يتكون الرسم البياني من مجموعة من الرؤوس (Vertices) متصلة فيما بينها بواسطة حواف أو وصلات (Edges).",
+            exp_en: "A graph is defined as a pair of vertices (nodes) and interconnecting edges."
+        },
+        // 16 - Topic: Graph Directed
+        {
+            topic: "الرسوم البيانية / Graphs",
+            ar_q: "ماذا يسمى الرسم البياني الذي تحتوي حوافه على اتجاه محدد ومسار باتجاه واحد؟",
+            en_q: "What is a graph called when its edges possess a specific one-way direction?",
+            options: [
+                { ar: "رسم بياني كامل", en: "Complete graph" },
+                { ar: "رسم بياني دائري", en: "Circular graph" },
+                { ar: "رسم بياني مفرغ", en: "Sparse graph" },
+                { ar: "رسم بياني موجه", en: "Directed graph" }
+            ],
+            correct: 3, // D
+            exp_ar: "الرسم البياني الموجه (Directed Graph أو Digraph) تحدد حوافه اتجاه الحركة من رأس لآخر.",
+            exp_en: "A directed graph features edges that have a distinct directional orientation."
+        },
+        // 17 - Topic: Hash Table
+        {
+            topic: "جداول التجزئة / Hash Table",
+            ar_q: "ما هو المبدأ الأساسي الذي يقوم عليه تخزين البيانات في جدول التجزئة (Hash Table)؟",
+            en_q: "What basic principle underlies data storage in a Hash Table?",
+            options: [
+                { ar: "أزواج من المفاتيح والقيم", en: "Key-Value pairs" },
+                { ar: "المقارنة الثنائية المتتابعة", en: "Sequential binary comparisons" },
+                { ar: "المؤشرات المزدوجة المتتالية", en: "Doubly linked pointer chains" },
+                { ar: "التفريغ الدائري للأرقام", en: "Circular numeric offsets" }
+            ],
+            correct: 0, // A
+            exp_ar: "جدول التجزئة يخزن البيانات على هيئة أزواج (مفتاح وقيمة) لتسهيل استرجاع المعلومة باستخدام مفتاحها.",
+            exp_en: "Hash tables store information in Key-Value format for quick associative retrieval."
+        },
+        // 18 - Topic: Hash function
+        {
+            topic: "جداول التجزئة / Hash Table",
+            ar_q: "ما هي وظيفة دالة الهاش (Hash Function) في جدول التجزئة؟",
+            en_q: "What is the primary role of a Hash Function in a hash table?",
+            options: [
+                { ar: "ترتيب البيانات أبجدياً", en: "Alphabetically sorting values" },
+                { ar: "تحويل المفتاح إلى موقع تخزين", en: "Mapping key to storage index" },
+                { ar: "حذف العناصر المكررة", en: "Removing duplicate records" },
+                { ar: "ضغط حجم الملفات", en: "Compressing memory footprint" }
+            ],
+            correct: 1, // B
+            exp_ar: "تستقبل دالة التجزئة المفتاح وتحوله إلى رقم فهرس يحدد موضع تخزينه في الذاكرة.",
+            exp_en: "A hash function takes a key and computes an index where the value can be stored."
+        },
+        // 19 - Topic: Hash Table complexity
+        {
+            topic: "جداول التجزئة / Hash Table",
+            ar_q: "كم يبلغ متوسط التعقيد الزمني لعملية البحث عن قيمة داخل جدول التجزئة الجيد؟",
+            en_q: "What is the average time complexity for searching a value in a good hash table?",
+            options: [
+                { ar: "زمن خطي O(n)", en: "Linear time O(n)" },
+                { ar: "زمن تربيعي O(n²)", en: "Quadratic time O(n²)" },
+                { ar: "زمن ثابت O(1)", en: "Constant time O(1)" },
+                { ar: "زمن أسي O(2ⁿ)", en: "Exponential time O(2ⁿ)" }
+            ],
+            correct: 2, // C
+            exp_ar: "في الحالات المتوسطة، توفر جداول التجزئة سرعة استرجاع مذهلة بزمن ثابت O(1).",
+            exp_en: "On average, hash table operations achieve near-instant O(1) constant time."
+        },
+        // 20 - Topic: Stack Applications
+        {
+            topic: "المكدس / Stack",
+            ar_q: "أي من التطبيقات العملية التالية يعتمد بصورة مباشرة على هيكل المكدس (Stack)؟",
+            en_q: "Which real-world application directly relies on the Stack data structure?",
+            options: [
+                { ar: "طباعة الأوراق بالطابعة", en: "Printer queue jobs" },
+                { ar: "جدولة إشارات المرور", en: "Traffic light scheduler" },
+                { ar: "تنظيم مسارات الطيران", en: "Flight routing graph" },
+                { ar: "زر التراجع (Undo)", en: "Undo operation in editors" }
+            ],
+            correct: 3, // D
+            exp_ar: "ميزة التراجع (Undo) تستخدم المكدس؛ لأنها تسترجع آخر عملية قام بها المستخدم فوراً.",
+            exp_en: "Undo features rely on a stack because the most recent action needs to be undone first."
+        },
+        // 21 - Topic: Queue Applications
+        {
+            topic: "طابور الانتظار / Queue",
+            ar_q: "أي سيناريو واقعي يمثل تطبيقاً نموذجياً لطابور الانتظار (Queue)؟",
+            en_q: "Which practical scenario represents a standard application of a Queue?",
+            options: [
+                { ar: "جدولة مهام الطابعة", en: "Printer document queue" },
+                { ar: "تصفح مجلدات الملفات", en: "Browsing folder trees" },
+                { ar: "حساب الأعداد الأولية", en: "Prime number calculation" },
+                { ar: "التنقل في سجل المتصفح", en: "Back button history" }
+            ],
+            correct: 0, // A
+            exp_ar: "أوراق الطباعة تعالج بنظام الطابور؛ فأول ملف يتم إرساله هو أول ملف تتم طباعته (FIFO).",
+            exp_en: "Printer jobs process on a first-come, first-served basis (FIFO queue)."
+        },
+        // 22 - Topic: Doubly Linked List
+        {
+            topic: "القوائم المترابطة / Linked List",
+            ar_q: "ما الذي يميز القائمة المترابطة المزدوجة (Doubly Linked List)؟",
+            en_q: "What distinguishes a doubly linked list from a singly linked list?",
+            options: [
+                { ar: "تخزن الأعداد فقط", en: "Stores only numeric keys" },
+                { ar: "تمتلك مؤشرين للسابق والتالي", en: "Holds pointers to prev and next" },
+                { ar: "حجمها ثابت كالمصفوفات", en: "Has immutable fixed size" },
+                { ar: "تتفرع كهيئة شجرة", en: "Branches like binary trees" }
+            ],
+            correct: 1, // B
+            exp_ar: "كل عقدة في القائمة المزدوجة تحمل مؤشرين: أحدهما يشير للعقدة السابقة والآخر للعقدة اللاحقة.",
+            exp_en: "Nodes in a doubly linked list keep references to both their predecessor and successor."
+        },
+        // 23 - Topic: Circular Linked List
+        {
+            topic: "القوائم المترابطة / Linked List",
+            ar_q: "إلى ماذا يشير مؤشر العقدة الأخيرة في القائمة المترابطة الدائرية (Circular)؟",
+            en_q: "Where does the 'next' pointer of the last node point in a circular linked list?",
+            options: [
+                { ar: "يشير للقيمة الخالية Null", en: "Points to null terminator" },
+                { ar: "يشير لعقدة عشوائية", en: "Points to a random node" },
+                { ar: "يشير للعقدة الأولى بالرأس", en: "Points back to first node" },
+                { ar: "يشير لنفسه في مكانه", en: "Points directly to itself" }
+            ],
+            correct: 2, // C
+            exp_ar: "في القائمة الدائرية، لا تحتوي العقدة الأخيرة على Null بل تلتف لتشير للعقدة الأولى (Head).",
+            exp_en: "The last node in a circular list links back to the head node, forming a loop."
+        },
+        // 24 - Topic: Stack Peek/Top
+        {
+            topic: "المكدس / Stack",
+            ar_q: "ما هي وظيفة عملية الرؤية (Peek / Top) في هيكل المكدس؟",
+            en_q: "What does the Peek (or Top) operation do in a stack?",
+            options: [
+                { ar: "حذف جميع العناصر", en: "Deletes all elements" },
+                { ar: "إضافة عنصر جديد", en: "Inserts a new element" },
+                { ar: "عكس ترتيب المكدس", en: "Reverses stack order" },
+                { ar: "قراءة القمة دون حذفها", en: "Inspects top without removal" }
+            ],
+            correct: 3, // D
+            exp_ar: "دالة peek تقرأ وتفحص العنصر الموجود في أعلى المكدس دون أن تحذفه من الهيكل.",
+            exp_en: "Peek accesses and reads the top element without popping it off the stack."
+        },
+        // 25 - Topic: Primitive - Boolean
+        {
+            topic: "أنواع أولية / Primitives",
+            ar_q: "كم عدد القيم المحتملة التي يمكن أن يحملها النوع المنطقي (Boolean)؟",
+            en_q: "How many distinct values can a Boolean data type hold?",
+            options: [
+                { ar: "قيمتان اثنتان فقط", en: "Only 2 values (True/False)" },
+                { ar: "أربع قيم متتالية", en: "Four possible values" },
+                { ar: "قيمة عددية موجبة", en: "Any positive integer" },
+                { ar: "عدد لا نهائي", en: "Infinite range of states" }
+            ],
+            correct: 0, // A
+            exp_ar: "النوع المنطقي أولي ويحتمل قيمتين فقط: صواب (True) أو خطأ (False).",
+            exp_en: "A Boolean primitive only represents two states: True or False."
+        },
+        // 26 - Topic: Float type
+        {
+            topic: "أنواع أولية / Primitives",
+            ar_q: "أي نوع بيانات أولي يُستخدم لتمثيل الأرقام التي تحتوي على فواصل عشرية (مثل 3.14)؟",
+            en_q: "Which primitive data type is used to represent fractional numbers like 3.14?",
+            options: [
+                { ar: "النوع الصحيح Integer", en: "Integer type" },
+                { ar: "النوع العشري Float", en: "Float type" },
+                { ar: "النوع الحرفي Character", en: "Character type" },
+                { ar: "النوع المنطقي Boolean", en: "Boolean type" }
+            ],
+            correct: 1, // B
+            exp_ar: "الأرقام التي تحتوي على كسور أو فواصل عشرية تُخزن باستخدام نوع Float أو Double.",
+            exp_en: "Float (floating-point) is designed specifically to represent numbers with decimal fractions."
+        },
+        // 27 - Topic: BST Property
+        {
+            topic: "الأشجار / Trees",
+            ar_q: "في شجرة البحث الثنائية (BST)، أين توضع القيم الأصغر من قيمة العقدة الحالية؟",
+            en_q: "In a Binary Search Tree (BST), where are values smaller than the current node placed?",
+            options: [
+                { ar: "في الشجرة الفرعية اليمنى", en: "In the right subtree" },
+                { ar: "في نفس العقدة الحالية", en: "Inside the current node" },
+                { ar: "في الشجرة الفرعية اليسرى", en: "In the left subtree" },
+                { ar: "عند رأس جذر الشجرة", en: "At the root position" }
+            ],
+            correct: 2, // C
+            exp_ar: "قاعدة شجرة البحث الثنائية تنص على أن كل قيمة أصغر من العقدة توضع يساراً، والأكبر توضع يميناً.",
+            exp_en: "In a BST, values strictly less than the node reside in its left subtree."
+        },
+        // 28 - Topic: Graph edge
+        {
+            topic: "الرسوم البيانية / Graphs",
+            ar_q: "ماذا تسمى الرابطة أو الخط الذي يصل بين رأسين في الرسم البياني؟",
+            en_q: "What is the link or connection connecting two vertices in a graph called?",
+            options: [
+                { ar: "المؤشر التالي", en: "Next pointer" },
+                { ar: "العقدة الفرعية", en: "Sub-node link" },
+                { ar: "مفتاح التجزئة", en: "Hash slot" },
+                { ar: "الحافة (Edge)", en: "Edge" }
+            ],
+            correct: 3, // D
+            exp_ar: "تسمى الوصلة بين أي رأسين (عقدتين) في الرسم البياني بالحافة (Edge).",
+            exp_en: "An edge is the line connecting two vertices (nodes) within a graph."
+        },
+        // 29 - Topic: Weighted Graph
+        {
+            topic: "الرسوم البيانية / Graphs",
+            ar_q: "ماذا يعني الرسم البياني الموزون (Weighted Graph)؟",
+            en_q: "What characterizes a Weighted Graph?",
+            options: [
+                { ar: "حوافه تحمل قيمة أو تكلفة عددية", en: "Edges have assigned numerical values" },
+                { ar: "يحتوي على جذور متعددة", en: "Has multiple designated roots" },
+                { ar: "تتساوى فيه الرؤوس مع الحواف", en: "Vertices exactly equal edge counts" },
+                { ar: "لا يحتوي على أي مسارات مغلقة", en: "Contains no closed cyclic paths" }
+            ],
+            correct: 0, // A
+            exp_ar: "الرسم البياني الموزون يحتوي على أوزان أو تكاليف عددية على الحواف لتمثيل المسافة أو الوقت.",
+            exp_en: "A weighted graph assigns weights (such as distances or costs) to its connecting edges."
+        },
+        // 30 - Topic: Hash collision
+        {
+            topic: "جداول التجزئة / Hash Table",
+            ar_q: "ماذا يسمى الموقف الذي تعطي فيه دالة الهاش نفس الموضع لمفتاحين مختلفين؟",
+            en_q: "What is the situation called when two different keys hash to the identical index?",
+            options: [
+                { ar: "فيضان الذاكرة", en: "Memory overflow" },
+                { ar: "تصادم التجزئة (Collision)", en: "Hash collision" },
+                { ar: "فقدان الفهرس", en: "Index dropout" },
+                { ar: "خطأ المؤشر الفارغ", en: "Null pointer fault" }
+            ],
+            correct: 1, // B
+            exp_ar: "يحدث التصادم (Collision) عندما يُنتج مفتاحان مختلفان نفس الفهرس من دالة الهاش.",
+            exp_en: "A collision occurs when a hash function generates the same slot for two unique keys."
+        },
+        // 31 - Topic: Arrays fixed size
+        {
+            topic: "المصفوفات / Arrays",
+            ar_q: "ما هو العيب الشائع للمصفوفات التقليدية الثابتة (Static Arrays)؟",
+            en_q: "What is a well-known limitation of static arrays in low-level programming?",
+            options: [
+                { ar: "بطء قراءة العناصر بالفهرس", en: "Slow lookup with indices" },
+                { ar: "عدم إمكانية حفظ الأرقام", en: "Inability to hold numbers" },
+                { ar: "صعوبة تغيير حجمها بعد إنشائها", en: "Fixed size cannot change easily" },
+                { ar: "استهلاك مؤشرات كثيرة لكل عنصر", en: "Excessive pointer overhead" }
+            ],
+            correct: 2, // C
+            exp_ar: "المصفوفات الثابتة تحجز حجماً محدداً مسبقاً في الذاكرة ولا يمكن زيادة حجمها أثناء التشغيل بسهولة.",
+            exp_en: "Static arrays have a fixed size predetermined at allocation time that cannot flex easily."
+        },
+        // 32 - Topic: Call stack
+        {
+            topic: "المكدس / Stack",
+            ar_q: "ما هو هيكل البيانات المستخدم في لغات البرمجة لمتابعة تنفيذ واستدعاء الدوال؟",
+            en_q: "Which data structure is used by runtime engines to track active function calls?",
+            options: [
+                { ar: "شجرة البحث", en: "Binary search tree" },
+                { ar: "جدول التجزئة", en: "Hash table" },
+                { ar: "طابور الانتظار", en: "Simple FIFO queue" },
+                { ar: "مكدس الاستدعاءات (Call Stack)", en: "Call stack" }
+            ],
+            correct: 3, // D
+            exp_ar: "نظام التشغيل ومترجمات اللغات تستخدم مكدس الاستدعاءات (Call Stack) لتنظيم تنفيذ الدوال وعودتها.",
+            exp_en: "The Call Stack manages function executions, parameters, and return addresses in LIFO order."
+        },
+        // 33 - Topic: Social Networks
+        {
+            topic: "الرسوم البيانية / Graphs",
+            ar_q: "أي هيكل بيانات هو الأنسب لتمثيل شبكات التواصل الاجتماعي وعلاقات الصداقة بين المستخدمين؟",
+            en_q: "Which data structure is ideal for modeling social networks and relationships among users?",
+            options: [
+                { ar: "الرسم البياني (Graph)", en: "Graph" },
+                { ar: "المكدس (Stack)", en: "Stack" },
+                { ar: "طابور الانتظار (Queue)", en: "Queue" },
+                { ar: "المصفوفة الأحادية", en: "1D Array" }
+            ],
+            correct: 0, // A
+            exp_ar: "الرسم البياني مثالي؛ فالمستخدمون يمثلون الرؤوس (Vertices) وعلاقات الصداقة تمثل الحواف (Edges).",
+            exp_en: "Graphs naturally represent social ties, where entities are vertices and friendships are edges."
+        },
+        // 34 - Topic: GPS navigation
+        {
+            topic: "الرسوم البيانية / Graphs",
+            ar_q: "في تطبيقات الخرائط والملاحة (مثل Google Maps)، كيف تُعامل المدن والطرق؟",
+            en_q: "In GPS and mapping apps, how are cities and roads usually modeled?",
+            options: [
+                { ar: "قائمة مترابطة دائرية", en: "Circular linked list" },
+                { ar: "رسم بياني ذو حواف موزونة", en: "Graph with weighted edges" },
+                { ar: "مكدس تراكمي للمدن", en: "Stack of road coordinates" },
+                { ar: "طابور أولويات خطي", en: "Single priority array" }
+            ],
+            correct: 1, // B
+            exp_ar: "تُمثل المدن كرؤوس والطرق بينها كحواف تحمل وزناً يمثل المسافة أو زمن الرحلة.",
+            exp_en: "Cities form vertices and roads form weighted edges representing travel times or distances."
+        },
+        // 35 - Topic: File system
+        {
+            topic: "الأشجار / Trees",
+            ar_q: "ما هو الهيكل المستخدم عادة في أنظمة التشغيل لتنظيم الملفات والمجلدات؟",
+            en_q: "Which data structure is widely used by operating systems to organize files and folders?",
+            options: [
+                { ar: "المكدس الخطي", en: "Simple stack" },
+                { ar: "طابور ثنائي", en: "Dual queue" },
+                { ar: "الهيكل الهرمي للشجرة (Tree)", en: "Hierarchical Tree" },
+                { ar: "المصفوفة المسطحة", en: "Flat array" }
+            ],
+            correct: 2, // C
+            exp_ar: "نظام الملفات ينظم هرمياً مثل الشجرة: المجلد الرئيسي يمثل الجذر والمجلدات الفرعية والملفات تمثل الفروع والأوراق.",
+            exp_en: "File directories branch out hierarchically like trees from a root drive/folder."
+        },
+        // 36 - Topic: Linked List sequential access
+        {
+            topic: "القوائم المترابطة / Linked List",
+            ar_q: "كيف نصل إلى العنصر العاشر في قائمة مترابطة أحادية بسيطة؟",
+            en_q: "How do you access the 10th element in a basic singly linked list?",
+            options: [
+                { ar: "بالقفز المباشر برقم الفهرس", en: "By instant index offset" },
+                { ar: "باستخدام دالة الهاش", en: "Through a hash calculation" },
+                { ar: "بفرز القائمة تصاعدياً أولاً", en: "By sorting items first" },
+                { ar: "بالمرور تسلسلياً من الرأس", en: "Traversing sequentially from head" }
+            ],
+            correct: 3, // D
+            exp_ar: "القوائم المترابطة لا تتيح وصولاً عشوائياً، بل يلزم المرور خطوة بخطوة من أول عقدة حتى نصل للعاشرة.",
+            exp_en: "Linked lists lack random access; one must traverse pointers sequentially from the head."
+        },
+        // 37 - Topic: Deque
+        {
+            topic: "طابور الانتظار / Queue",
+            ar_q: "ماذا يسمى الطابور الذي يسمح بالإدراج والحذف من كلا الطرفين؟",
+            en_q: "What is a queue called that permits insertion and deletion from both ends?",
+            options: [
+                { ar: "طابور ثنائي الطرف (Deque)", en: "Double-ended queue (Deque)" },
+                { ar: "المكدس الشجري", en: "Tree stack" },
+                { ar: "طابور الأولوية البسيط", en: "Priority queue" },
+                { ar: "الطابور الدائري المفرد", en: "Single circular queue" }
+            ],
+            correct: 0, // A
+            exp_ar: "الطابور المزدوج النهاية (Deque) يتيح إجراء عمليات الإضافة والسحب من الأمام والخلف على السواء.",
+            exp_en: "A Double-Ended Queue (Deque) supports push and pop at both front and rear terminals."
+        },
+        // 38 - Topic: Empty Stack pop
+        {
+            topic: "المكدس / Stack",
+            ar_q: "ماذا يحدث عند محاولة استخراج عنصر من مكدس فارغ تماماً؟",
+            en_q: "What error condition occurs when trying to pop an element from an empty stack?",
+            options: [
+                { ar: "فيضان المكدس Overflow", en: "Stack overflow" },
+                { ar: "نقصان المكدس Underflow", en: "Stack underflow" },
+                { ar: "دوران القمة Rotate", en: "Stack rotation" },
+                { ar: "إعادة بناء المكدس Rebuild", en: "Stack rebuild" }
+            ],
+            correct: 1, // B
+            exp_ar: "تسمى محاولة السحب من مكدس فارغ بـ Stack Underflow، بينما الإضافة لمكدس ممتلئ تسمى Stack Overflow.",
+            exp_en: "Popping from an empty structure raises a Stack Underflow error condition."
+        },
+        // 39 - Topic: Tree Height
+        {
+            topic: "الأشجار / Trees",
+            ar_q: "ماذا يمثل ارتفاع الشجرة (Tree Height)؟",
+            en_q: "What does the height of a tree represent?",
+            options: [
+                { ar: "إجمالي عدد العقد بالكامل", en: "Total number of nodes" },
+                { ar: "عدد العقد الورقية فقط", en: "Count of leaf nodes" },
+                { ar: "أطول مسار من الجذر إلى الورقة", en: "Longest path from root to leaf" },
+                { ar: "عدد الحواف المتصلة بالجذر", en: "Edges attached to the root" }
+            ],
+            correct: 2, // C
+            exp_ar: "ارتفاع الشجرة هو طول أطول مسار متصل من عقدة الجذر نزولاً إلى أبعد ورقة.",
+            exp_en: "Tree height measures the number of edges on the longest downward path from root to a leaf."
+        },
+        // 40 - Topic: Priority Queue
+        {
+            topic: "طابور الانتظار / Queue",
+            ar_q: "في أي نوع من الطوابير يتم تقديم العنصر بناءً على أهميته وليس ترتيب وصوله؟",
+            en_q: "In which queue variant is an item served based on importance rather than arrival time?",
+            options: [
+                { ar: "الطابور البسيط", en: "Simple FIFO queue" },
+                { ar: "الطابور الدائري", en: "Circular queue" },
+                { ar: "طابور المهام العكسي", en: "Reversed queue" },
+                { ar: "طابور الأولوية (Priority Queue)", en: "Priority Queue" }
+            ],
+            correct: 3, // D
+            exp_ar: "طابور الأولوية يخدم العناصر ذات الأولوية الأعلى أولاً بغض النظر عن وقت دخولها.",
+            exp_en: "A Priority Queue dequeues elements according to assigned priority weights rather than arrival."
+        },
+        // 41 - Topic: Character Primitive
+        {
+            topic: "أنواع أولية / Primitives",
+            ar_q: "ما نوع البيانات الأولي المستخدم لحفظ حرف مفرد مثل 'A' في لغات البرمجة؟",
+            en_q: "Which primitive type stores a single text symbol such as 'A' in languages like C/Java?",
+            options: [
+                { ar: "النوع الحرفي (Character)", en: "Character (char)" },
+                { ar: "النوع المزدوج (Double)", en: "Double type" },
+                { ar: "النوع المنطقي (Boolean)", en: "Boolean type" },
+                { ar: "نوع المصفوفة (Array)", en: "Array type" }
+            ],
+            correct: 0, // A
+            exp_ar: "النوع char يُعد نوعاً أولياً لتخزين حرف أبجدي أو رمز منفرد.",
+            exp_en: "Character (char) is the standard primitive representing an individual letter or symbol."
+        },
+        // 42 - Topic: Heap structure
+        {
+            topic: "الأشجار / Trees",
+            ar_q: "هيكل بيانات الهيب (Heap) مبني أساساً على أي هيكل من الهياكل التالية؟",
+            en_q: "The Heap data structure is fundamentally built upon which underlying structure?",
+            options: [
+                { ar: "الرسم البياني الدائري", en: "Circular graph" },
+                { ar: "الشجرة الثنائية الكاملة", en: "Complete binary tree" },
+                { ar: "القائمة المترابطة المفردة", en: "Singly linked list" },
+                { ar: "جدول التجزئة غير المرتب", en: "Unordered hash table" }
+            ],
+            correct: 1, // B
+            exp_ar: "الهيب (Max-Heap أو Min-Heap) هو شجرة ثنائية شبه كاملة تحقق شرط الترتيب الخاص بقيمة الأب.",
+            exp_en: "A Heap is conceptually a complete binary tree satisfying the specific heap-order property."
+        },
+        // 43 - Topic: Adjacency Matrix
+        {
+            topic: "الرسوم البيانية / Graphs",
+            ar_q: "أي من الطرق التالية تُستخدم لتمثيل الرسوم البيانية برمجياً؟",
+            en_q: "Which of the following is a standard method used to represent graphs in memory?",
+            options: [
+                { ar: "مصفوفة المكدس", en: "Stack array" },
+                { ar: "شجرة التجزئة", en: "Hash tree" },
+                { ar: "مصفوفة التجاور (Adjacency Matrix)", en: "Adjacency Matrix" },
+                { ar: "طابور المؤشرات", en: "Pointer queue" }
+            ],
+            correct: 2, // C
+            exp_ar: "تُمثل الرسوم البيانية غالباً إما بمصفوفة التجاور (Adjacency Matrix) أو قائمة التجاور (Adjacency List).",
+            exp_en: "Graphs are commonly implemented using either an Adjacency Matrix or an Adjacency List."
+        },
+        // 44 - Topic: Linked List Head
+        {
+            topic: "القوائم المترابطة / Linked List",
+            ar_q: "ماذا يُطلق على المؤشر الرئيسي الذي يشير إلى بداية القائمة المترابطة؟",
+            en_q: "What is the pointer called that references the first node of a linked list?",
+            options: [
+                { ar: "المؤشر الخلفي (Tail)", en: "Tail pointer" },
+                { ar: "مؤشر القمة (Top)", en: "Top pointer" },
+                { ar: "المؤشر الجذري (Root)", en: "Root pointer" },
+                { ar: "مؤشر الرأس (Head)", en: "Head pointer" }
+            ],
+            correct: 3, // D
+            exp_ar: "مؤشر الرأس (Head) هو المدخل الرئيسي للقائمة؛ وبدونه يفقد البرنامج الوصول لعقد القائمة.",
+            exp_en: "The Head pointer holds the memory reference to the beginning node of a linked list."
+        },
+        // 45 - Topic: Dictionary implementation
+        {
+            topic: "جداول التجزئة / Hash Table",
+            ar_q: "القواميس (Dictionaries) في لغة بايثون مبنية داخلياً باستخدام أي هيكل؟",
+            en_q: "Python Dictionaries (dict) are built under the hood using which data structure?",
+            options: [
+                { ar: "جدول التجزئة (Hash Table)", en: "Hash Table" },
+                { ar: "القائمة المترابطة", en: "Linked List" },
+                { ar: "طابور الانتظار المزدوج", en: "Deque queue" },
+                { ar: "المكدس الثنائي", en: "Binary stack" }
+            ],
+            correct: 0, // A
+            exp_ar: "قواميس بايثون والكائنات في لغات كثيرة تعتمد على جداول التجزئة لتحقيق سرعة البحث $O(1)$.",
+            exp_en: "Python dictionaries use optimized hash table mechanisms for fast key lookups."
+        },
+        // 46 - Topic: Parent vs Child in Trees
+        {
+            topic: "الأشجار / Trees",
+            ar_q: "في هيكل الشجرة، العقدة التي تقع مباشرة أسفل عقدة أخرى وترتبط بها تسمى:",
+            en_q: "In a tree, a node directly beneath and connected from another node is called a:",
+            options: [
+                { ar: "عقدة الجذر", en: "Root node" },
+                { ar: "عقدة الابن (Child)", en: "Child node" },
+                { ar: "عقدة الأب", en: "Parent node" },
+                { ar: "عقدة الجد", en: "Ancestor node" }
+            ],
+            correct: 1, // B
+            exp_ar: "العقدة العلوية تسمى الأب (Parent)، والعقدة الناتجة والمتصلة منها مباشرة تسمى الابن (Child).",
+            exp_en: "The descendant node connected directly below a parent is referred to as its child."
+        },
+        // 47 - Topic: Memory Allocation
+        {
+            topic: "القوائم المترابطة / Linked List",
+            ar_q: "كيف يتم تخصيص أماكن عقد القائمة المترابطة في ذاكرة الحاسوب؟",
+            en_q: "How are nodes of a linked list arranged across computer memory?",
+            options: [
+                { ar: "في صف مستمر ومتجاور فقط", en: "Strictly in contiguous blocks" },
+                { ar: "في خلايا متطابقة الحجم إجبارياً", en: "In strictly mirrored memory slots" },
+                { ar: "في أي مكان متاح بالذاكرة العشوائية", en: "Any available non-contiguous locations" },
+                { ar: "داخل سجلات المعالج فقط", en: "Stored only inside CPU registers" }
+            ],
+            correct: 2, // C
+            exp_ar: "عقد القائمة لا تشترط التتابع في الذاكرة؛ فكل عقدة قد تقع في مكان مختلف وترتبط بالأخرى عبر المؤشر.",
+            exp_en: "Nodes can be allocated anywhere in heap memory and are stitched together via pointers."
+        },
+        // 48 - Topic: Browser History
+        {
+            topic: "المكدس / Stack",
+            ar_q: "عند الضغط على زر العودة للخلف في متصفح الويب، أي هيكل بيانات يُستخدم لاسترجاع الصفحات؟",
+            en_q: "When pressing the Back button in a web browser, which data structure tracks past URLs?",
+            options: [
+                { ar: "طابور عادي FIFO", en: "Standard FIFO queue" },
+                { ar: "شجرة بحث ثنائية", en: "Binary search tree" },
+                { ar: "رسم بياني موجه", en: "Directed graph" },
+                { ar: "المكدس (Stack)", en: "Stack" }
+            ],
+            correct: 3, // D
+            exp_ar: "المتصفح يدفع الروابط في مكدس (Stack)، والعودة للخلف تسحب آخر صفحة تمت زيارتها فوراً.",
+            exp_en: "Browser history utilizes a stack to immediately pop and return to the latest visited page."
+        },
+        // 49 - Topic: Linear vs Non-Linear speed
+        {
+            topic: "تصنيف الهياكل / Classification",
+            ar_q: "أي من الهياكل التالية يرتب بياناته في علاقة مستويات متعددة (متعدد المستويات)؟",
+            en_q: "Which of the following structures arranges data in a multi-level relationship?",
+            options: [
+                { ar: "الشجرة (Tree)", en: "Tree" },
+                { ar: "المصفوفة", en: "Array" },
+                { ar: "المكدس", en: "Stack" },
+                { ar: "طابور الانتظار", en: "Queue" }
+            ],
+            correct: 0, // A
+            exp_ar: "الأشجار هياكل متعددة المستويات (Multi-level) هرمية، بينما البقية هياكل خطية أحادية المستوى.",
+            exp_en: "Trees are multi-level hierarchical structures, unlike single-level linear arrangements."
+        },
+        // 50 - Topic: Overall review
+        {
+            topic: "ملخص عام / Summary",
+            ar_q: "لماذا نتعلم ونستخدم هياكل بيانات مختلفة بدلاً من استخدام نوع واحد فقط؟",
+            en_q: "Why do we study various data structures instead of relying on a single uniform type?",
+            options: [
+                { ar: "لإلغاء الحاجة للغات البرمجة", en: "To replace programming languages" },
+                { ar: "لاختيار الهيكل الأنسب كفاءة لكل مهمة", en: "To pick the optimal structure for efficiency" },
+                { ar: "لتقليل دقة العمليات الحسابية", en: "To reduce calculation precision" },
+                { ar: "لإجبار الحاسوب على العمل ببطء", en: "To enforce sequential CPU execution" }
+            ],
+            correct: 1, // B
+            exp_ar: "كل هيكل بيانات يمتلك نقاط قوة وتكلفة زمنية مختلفة تناسب مشاكل وسيناريوهات برمجية معينة.",
+            exp_en: "Different data structures optimize performance (time/memory) for distinct computational tasks."
+        }
+    ];
+
+    let userAnswers = new Array(questions.length).fill(null);
+    let currentIdx = 0;
+    let score = 0;
+
+    function loadScores() {
+        const storedHigh = localStorage.getItem('ds_quiz_50_high');
+        const high = storedHigh ? parseInt(storedHigh) : 0;
+        document.getElementById('highScore').innerText = high;
+
+        const storedFirst = localStorage.getItem('ds_quiz_50_first');
+        if (storedFirst !== null) {
+            document.getElementById('firstScore').innerText = storedFirst;
+        } else {
+            document.getElementById('firstScore').innerText = "--";
+        }
+        return { high, first: storedFirst };
+    }
+
+    function saveScores(finalScore) {
+        let isFirstTime = false;
+        if (localStorage.getItem('ds_quiz_50_first') === null) {
+            localStorage.setItem('ds_quiz_50_first', finalScore);
+            document.getElementById('firstScore').innerText = finalScore;
+            isFirstTime = true;
+        }
+
+        const currentHigh = parseInt(localStorage.getItem('ds_quiz_50_high') || '0');
+        let isNewHigh = false;
+        if (finalScore > currentHigh) {
+            localStorage.setItem('ds_quiz_50_high', finalScore);
+            document.getElementById('highScore').innerText = finalScore;
+            isNewHigh = true;
+        }
+
+        return { isFirstTime, isNewHigh };
+    }
+
+    function calculateScore() {
+        let s = 0;
+        for (let i = 0; i < questions.length; i++) {
+            if (userAnswers[i] !== null && userAnswers[i] === questions[i].correct) {
+                s++;
+            }
+        }
+        score = s;
+        document.getElementById('score').innerText = score;
+        return score;
+    }
+
+    function displayQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('qCurrent').innerText = currentIdx + 1;
+        document.getElementById('topicBadge').innerText = q.topic;
+        document.getElementById('questionTextAr').innerText = (currentIdx + 1) + ". " + q.ar_q;
+        document.getElementById('questionTextEn').innerText = "Q" + (currentIdx + 1) + ": " + q.en_q;
+
+        const answeredCount = userAnswers.filter(a => a !== null).length;
+        const pct = (answeredCount / questions.length) * 100;
+        document.getElementById('progressBar').style.width = pct + '%';
+
+        const container = document.getElementById('optionsContainer');
+        container.innerHTML = '';
+
+        const expBox = document.getElementById('explanationText');
+        const statusIndicator = document.getElementById('qStatusIndicator');
+
+        const prevAns = userAnswers[currentIdx];
+
+        if (prevAns === null) {
+            statusIndicator.innerText = "لم يُجب بعد / Not answered";
+            statusIndicator.style.color = "var(--text-muted)";
+            expBox.style.display = 'none';
+        } else {
+            statusIndicator.innerText = prevAns === q.correct ? "✅ إجابة صحيحة مسجلة" : "❌ إجابة خاطئة مسجلة";
+            statusIndicator.style.color = prevAns === q.correct ? "var(--success)" : "var(--danger)";
+            showExplanation(prevAns === q.correct, prevAns);
+        }
+
+        q.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerHTML = `
+                <div class="opt-ar">${['أ', 'ب', 'ج', 'د'][idx]}) ${opt.ar}</div>
+                <div class="opt-en">${['A', 'B', 'C', 'D'][idx]}) ${opt.en}</div>
+            `;
+
+            if (prevAns !== null) {
+                btn.disabled = true;
+                if (idx === q.correct) {
+                    btn.classList.add('correct');
+                } else if (idx === prevAns) {
+                    btn.classList.add('wrong');
+                }
+            } else {
+                btn.onclick = () => selectAnswer(idx);
+            }
+            container.appendChild(btn);
+        });
+
+        document.getElementById('prevBtn').disabled = (currentIdx === 0);
+        document.getElementById('nextBtn').innerText = (currentIdx === questions.length - 1) ? "إنهاء الاختبار / Finish 🏁" : "التالي / Next ⬅️";
+    }
+
+    function selectAnswer(chosenIdx) {
+        if (userAnswers[currentIdx] !== null) return;
+
+        userAnswers[currentIdx] = chosenIdx;
+        calculateScore();
+
+        const q = questions[currentIdx];
+        const isCorrect = (chosenIdx === q.correct);
+
+        const buttons = document.querySelectorAll('.opt-btn');
+        buttons.forEach(b => b.disabled = true);
+
+        if (isCorrect) {
+            buttons[chosenIdx].classList.add('correct');
+        } else {
+            buttons[chosenIdx].classList.add('wrong');
+            buttons[q.correct].classList.add('correct');
+        }
+
+        showExplanation(isCorrect, chosenIdx);
+
+        const statusIndicator = document.getElementById('qStatusIndicator');
+        statusIndicator.innerText = isCorrect ? "✅ إجابة صحيحة مسجلة" : "❌ إجابة خاطئة مسجلة";
+        statusIndicator.style.color = isCorrect ? "var(--success)" : "var(--danger)";
+
+        const answeredCount = userAnswers.filter(a => a !== null).length;
+        document.getElementById('progressBar').style.width = ((answeredCount / questions.length) * 100) + '%';
+    }
+
+    function showExplanation(isCorrect, chosenIdx) {
+        const q = questions[currentIdx];
+        const expBox = document.getElementById('explanationText');
+
+        if (isCorrect) {
+            expBox.innerHTML = `
+                <b>✅ إجابة صحيحة / Correct!</b><br>
+                <div>${q.exp_ar}</div>
+                <div class="exp-en">${q.exp_en}</div>
+            `;
+            expBox.style.borderRightColor = 'var(--success)';
+        } else {
+            expBox.innerHTML = `
+                <b>❌ إجابة غير صحيحة / Incorrect!</b><br>
+                <div>الإجابة الصحيحة هي: <b>${q.options[q.correct].ar}</b></div>
+                <div class="exp-en">Correct choice: <b>${q.options[q.correct].en}</b></div>
+                <div style="margin-top: 6px;">${q.exp_ar}</div>
+                <div class="exp-en">${q.exp_en}</div>
+            `;
+            expBox.style.borderRightColor = 'var(--danger)';
+        }
+        expBox.style.display = 'block';
+    }
+
+    function nextQuestion() {
+        if (currentIdx < questions.length - 1) {
+            currentIdx++;
+            displayQuestion();
+        } else {
+            showFinalResults();
+        }
+    }
+
+    function prevQuestion() {
+        if (currentIdx > 0) {
+            currentIdx--;
+            displayQuestion();
+        }
+    }
+
+    function openIndexModal() {
+        buildIndexGrid();
+        document.getElementById('indexModal').style.display = 'flex';
+    }
+
+    function closeIndexModal() {
+        document.getElementById('indexModal').style.display = 'none';
+    }
+
+    function closeIndexModalOnOutside(e) {
+        if (e.target.id === 'indexModal') {
+            closeIndexModal();
+        }
+    }
+
+    function buildIndexGrid() {
+        const grid = document.getElementById('gridIndexContainer');
+        grid.innerHTML = '';
+
+        for (let i = 0; i < questions.length; i++) {
+            const pill = document.createElement('div');
+            pill.className = 'index-pill';
+            pill.innerText = (i + 1);
+
+            if (i === currentIdx) {
+                pill.classList.add('active');
+            }
+
+            if (userAnswers[i] !== null) {
+                if (userAnswers[i] === questions[i].correct) {
+                    pill.classList.add('solved-correct');
+                } else {
+                    pill.classList.add('solved-wrong');
+                }
+            }
+
+            pill.onclick = () => {
+                currentIdx = i;
+                displayQuestion();
+                closeIndexModal();
+            };
+
+            grid.appendChild(pill);
+        }
+    }
+
+    function showFinalResults() {
+        document.getElementById('quizCard').style.display = 'none';
+        document.getElementById('progressBar').style.width = '100%';
+
+        const resultsCard = document.getElementById('resultsCard');
+        resultsCard.style.display = 'block';
+
+        calculateScore();
+        document.getElementById('finalScore').innerText = score;
+        const res = saveScores(score);
+        const scores = loadScores();
+
+        const notice = document.getElementById('highScoreNotice');
+        const msg = document.getElementById('resultMsg');
+        const icon = document.getElementById('trophyIcon');
+
+        let textDetails = `🎯 أول محاولة مسجلة (First Attempt): ${scores.first} من 50<br>`;
+        if (res.isNewHigh && score > 0) {
+            textDetails += `🏆 مبروك! حققت رقماً قياسياً جديداً: ${score} من 50!`;
+        } else {
+            textDetails += `🏆 أعلى نتيجة على هذا الجهاز: ${scores.high} من 50`;
+        }
+        notice.innerHTML = textDetails;
+
+        if (score >= 45) {
+            msg.innerText = "أداء خبير وامتياز تام! فهم شامل لأساسيات هياكل البيانات";
+            icon.innerText = "👑";
+        } else if (score >= 35) {
+            msg.innerText = "رائع جداً! استيعاب قوي لأغلب المفاهيم والأنواع";
+            icon.innerText = "🎉";
+        } else if (score >= 25) {
+            msg.innerText = "مستوى جيد، ننصح بمراجعة الفروق بين الهياكل غير الخطية";
+            icon.innerText = "👍";
+        } else {
+            msg.innerText = "بداية جيدة، يُفضل مراجعة الأساسيات وإعادة المحاولة لترسيخ الفهم";
+            icon.innerText = "💡";
+        }
+    }
+
+    function restartQuiz() {
+        userAnswers = new Array(questions.length).fill(null);
+        currentIdx = 0;
+        score = 0;
+        document.getElementById('score').innerText = '0';
+        document.getElementById('resultsCard').style.display = 'none';
+        document.getElementById('quizCard').style.display = 'block';
+        displayQuestion();
+    }
+
+    window.onload = function() {
+        loadScores();
+        displayQuestion();
+    };
+</script>
+</body>
+</html>

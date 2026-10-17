@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الدرس التالي: خوارزمية بيلمان-فورد (Bellman-Ford)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Fira+Code:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-page: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --primary: #4338ca;
+            --primary-soft: #eef2ff;
+            --secondary: #059669;
+            --secondary-soft: #ecfdf5;
+            --warning: #d97706;
+            --warning-soft: #fffbeb;
+            --danger: #dc2626;
+            --danger-soft: #fef2f2;
+            --text-dark: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-body);
+            line-height: 1.9;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #ffffff 0%, #eef2ff 100%);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 40px 24px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(67, 56, 202, 0.08);
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 2.3rem;
+            font-weight: 900;
+            margin-bottom: 12px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .section-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 28px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 20px 0 10px 0;
+        }
+
+        p {
+            margin-bottom: 14px;
+            font-size: 1.05rem;
+        }
+
+        .story-box {
+            background-color: #f8fafc;
+            border-right: 5px solid var(--primary);
+            padding: 18px 22px;
+            border-radius: 8px 14px 14px 8px;
+            margin: 16px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            border-left: 1px solid var(--border);
+        }
+
+        .story-badge {
+            background-color: var(--primary-soft);
+            color: var(--primary);
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .danger-box {
+            background-color: var(--danger-soft);
+            border-right: 5px solid var(--danger);
+            padding: 18px 22px;
+            border-radius: 8px 14px 14px 8px;
+            margin: 16px 0;
+            color: #7f1d1d;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            margin: 16px 0;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        .sim-container {
+            display: grid;
+            grid-template-columns: 1.25fr 0.75fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 860px) {
+            .sim-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .canvas-wrapper {
+            background-color: #ffffff;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            position: relative;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .controls-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(67, 56, 202, 0.2);
+        }
+
+        .btn:hover {
+            background-color: #3730a3;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background-color: #ffffff;
+            color: var(--text-dark);
+            border: 1.5px solid var(--border);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background-color: #f1f5f9;
+            transform: none;
+        }
+
+        /* SVG Graph Classes */
+        .edge {
+            stroke: #cbd5e1;
+            stroke-width: 3.5;
+            transition: all 0.3s ease;
+        }
+
+        .edge.evaluating {
+            stroke: var(--warning);
+            stroke-width: 6;
+            stroke-dasharray: 8;
+            animation: moveDash 0.8s linear infinite;
+        }
+
+        .edge.relaxed {
+            stroke: var(--secondary);
+            stroke-width: 5;
+        }
+
+        @keyframes moveDash {
+            to { stroke-dashoffset: -16; }
+        }
+
+        .node-circle {
+            fill: #ffffff;
+            stroke: #94a3b8;
+            stroke-width: 3.5;
+            transition: all 0.3s ease;
+        }
+
+        .node-circle.from-node {
+            fill: #fef08a;
+            stroke: var(--warning);
+            stroke-width: 5;
+            transform: scale(1.1);
+            transform-origin: center;
+        }
+
+        .node-circle.to-node {
+            fill: #ecfdf5;
+            stroke: var(--secondary);
+            stroke-width: 5;
+            transform: scale(1.1);
+            transform-origin: center;
+        }
+
+        .node-text {
+            fill: var(--text-dark);
+            font-weight: 800;
+            font-size: 16px;
+            text-anchor: middle;
+            dominant-baseline: central;
+            pointer-events: none;
+        }
+
+        .edge-label-bg {
+            fill: #ffffff;
+            stroke: #e2e8f0;
+            stroke-width: 1.5;
+        }
+
+        .edge-label-text {
+            font-size: 13px;
+            font-weight: 800;
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+
+        .weight-positive { fill: var(--primary); }
+        .weight-negative { fill: var(--danger); }
+
+        .live-narrative {
+            background-color: var(--primary-soft);
+            border: 1px solid #c7d2fe;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 14px;
+            font-size: 1rem;
+            color: #312e81;
+            font-weight: 600;
+            min-height: 90px;
+            display: flex;
+            align-items: center;
+        }
+
+        .badge-round {
+            background: #e0e7ff;
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 800;
+        }
+
+        pre {
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 20px;
+            border-radius: 14px;
+            overflow-x: auto;
+            direction: ltr;
+            text-align: left;
+            margin: 16px 0;
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+
+        .c-kw { color: #f43f5e; font-weight: bold; }
+        .c-fn { color: #38bdf8; }
+        .c-cm { color: #64748b; font-style: italic; }
+        .c-nm { color: #fbbf24; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>الدرس التالي: خوارزمية بيلمان-فورد (Bellman-Ford)</h1>
+        <p>البطل الحقيقي عند وجود العروض والخصومات (الأوزان السالبة) وكاشف فخاخ الديون اللانهائية!</p>
+    </header>
+
+    <!-- 1. الربط بالدرس السابق والقصة الواقعية -->
+    <div class="section-card">
+        <h2>1. التمهيد من الدرس السابق: لماذا احتجنا بديلاً لديكسترا؟</h2>
+        <p>في الدرس السابق اكتشفنا نقطة ضعف خطيرة: ديكسترا خوارزمية <strong>"طماعة ومستعجلة"</strong>، تغلق المدينة فور وصولها إليها وتفترض أن التكاليف مستحيل أن تقل لاحقاً.</p>
+
+        <div class="story-box">
+            <span class="story-badge">قصة من الواقع (كوبونات الخصم)</span>
+            <p>تخيل أنك تشتري من متجر إلكتروني:</p>
+            <ul>
+                <li>اخترت خدمة توصيل عادية وسريعة كلفتك <strong>40 جنيهاً</strong> (ديكسترا ستعتمدها فوراً وتغلق الطلب).</li>
+                <li>لكن هناك خيار آخر: لو اشتركت في الباقة الذهبية أولاً بـ <strong>50 جنيهاً</strong>، المتجر يعطيك كوبون كاش باك بقيمة <strong>(-30 جنيهاً)</strong> عند شحن المنتج!</li>
+                <li>التكلفة الإجمالية في المسار الثاني أصبحت: \(50 - 30 = 20\) جنيهاً فقط!</li>
+            </ul>
+            <p>ديكسترا لن تكتشف هذا التوفير أبداً، وهنا يأتي دور خوارزمية <strong>Bellman-Ford</strong> الصبورة والمتأنية التي لا تتعجل في اتخاذ القرار.</p>
+        </div>
+    </div>
+
+    <!-- 2. كيف تفكر بيلمان-فورد؟ -->
+    <div class="section-card">
+        <h2>2. كيف تفكر الخوارزمية؟ سر قاعدة (V - 1) جولات</h2>
+        <p>بيلمان-فورد لا تستخدم مبدأ الطمع، بل تستخدم أسلوباً مضموناً اسمه <strong>التكرار المنظم (Relaxation Iterations)</strong>:</p>
+
+        <div class="story-box">
+            <span class="story-badge">قاعدة المترو والمحطات</span>
+            <p>لو عندك خط مترو فيه <strong>4 محطات</strong> (A ← B ← C ← D):</p>
+            <ul>
+                <li>لكي تسافر من المحطة الأولى إلى الأخيرة، أقصى عدد من التبديلات (الوصلات) الممكنة بدون لف في دوائر هو: <strong>3 وصلات فقط (عدد المحطات ناقص 1)</strong>.</li>
+                <li>لذلك تقول لك الخوارزمية: <em>"سأمر على كل شوارع الخريطة بلا استثناء وأقوم بتحسينها، وسأكرر هذا المرور الشامل عدد مرات يساوي (عدد العقد - 1)"</em>.</li>
+                <li>إذا كان لديك 4 عقد، سنقوم بـ <strong>3 جولات فحص كاملة</strong> لنضمن وصول تأثير أي تحديث إلى آخر الخريطة.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 3. المحاكي التفاعلي -->
+    <div class="section-card">
+        <h2>3. المحاكي التفاعلي: شاهد كيف تتفوق على ديكسترا خطوة بخطوة</h2>
+        <p>في هذا الرسم الموجه: نبدأ من A. لاحظ أن الطريق المباشر من A إلى C وزنه <strong>5</strong>، بينما الطريق عبر B يكلف 4 ثم يمنحك خصماً سالباً <strong>(-2)</strong>! اضغط على <strong>"الخطوة التالية"</strong> لمراقبة الجولات وتحديث المسافات:</p>
+
+        <div class="sim-container">
+            <div>
+                <div class="canvas-wrapper">
+                    <svg id="bf-svg" viewBox="0 0 500 350">
+                        <defs>
+                            <marker id="arrow" viewBox="0 0 10 10" refX="28" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8"/>
+                            </marker>
+                            <marker id="arrow-active" viewBox="0 0 10 10" refX="28" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="#d97706"/>
+                            </marker>
+                            <marker id="arrow-relaxed" viewBox="0 0 10 10" refX="28" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="#059669"/>
+                            </marker>
+                        </defs>
+
+                        <!-- الحواف الموجهة -->
+                        <line id="e-AB" class="edge" x1="100" y1="175" x2="250" y2="80" marker-end="url(#arrow)" />
+                        <line id="e-AC" class="edge" x1="100" y1="175" x2="250" y2="270" marker-end="url(#arrow)" />
+                        <line id="e-BC" class="edge" x1="250" y1="80" x2="250" y2="270" marker-end="url(#arrow)" />
+                        <line id="e-CD" class="edge" x1="250" y1="270" x2="400" y2="175" marker-end="url(#arrow)" />
+
+                        <!-- الأوزان على الطرق -->
+                        <circle cx="170" cy="115" r="14" class="edge-label-bg" />
+                        <text x="170" y="115" class="edge-label-text weight-positive">+4</text>
+
+                        <circle cx="170" cy="235" r="14" class="edge-label-bg" />
+                        <text x="170" y="235" class="edge-label-text weight-positive">+5</text>
+
+                        <!-- الوزن السالب البارز -->
+                        <circle cx="265" cy="175" r="16" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5" />
+                        <text x="265" y="175" class="edge-label-text weight-negative">-2</text>
+
+                        <circle cx="330" cy="235" r="14" class="edge-label-bg" />
+                        <text x="330" y="235" class="edge-label-text weight-positive">+3</text>
+
+                        <!-- العقد -->
+                        <g id="node-A">
+                            <circle id="c-A" class="node-circle" cx="100" cy="175" r="22" />
+                            <text class="node-text" x="100" y="175">A</text>
+                        </g>
+                        <g id="node-B">
+                            <circle id="c-B" class="node-circle" cx="250" cy="80" r="22" />
+                            <text class="node-text" x="250" y="80">B</text>
+                        </g>
+                        <g id="node-C">
+                            <circle id="c-C" class="node-circle" cx="250" cy="270" r="22" />
+                            <text class="node-text" x="250" y="270">C</text>
+                        </g>
+                        <g id="node-D">
+                            <circle id="c-D" class="node-circle" cx="400" cy="175" r="22" />
+                            <text class="node-text" x="400" y="175">D</text>
+                        </g>
+                    </svg>
+                </div>
+
+                <div class="controls-bar">
+                    <button class="btn" onclick="nextBFStep()">الخطوة التالية ◀</button>
+                    <button class="btn btn-outline" onclick="resetBFSim()">إعادة المحاكاة ↺</button>
+                    <span id="round-indicator" class="badge-round">التهيئة المبدئية</span>
+                </div>
+            </div>
+
+            <!-- جدول المسافات -->
+            <div>
+                <h3 style="margin-top:0;">جدول المسافات المؤكدة</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>العقدة</th>
+                            <th>أقل مسافة مسجلة</th>
+                            <th>العقدة السابقة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bf-table-body">
+                    </tbody>
+                </table>
+
+                <div class="live-narrative" id="bf-narrative">
+                    اضغط على "الخطوة التالية" لمشاهدة جولة الفحص والتعديل الأولى.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. الميزة الخارقة: كشف الدورات السالبة -->
+    <div class="section-card">
+        <h2>4. الميزة الخارقة: كشف فخاخ الديون اللانهائية (Negative Weight Cycles)</h2>
+        <p>هناك مصيبة قد تحدث في الرسوم البيانية، لا يمكن لأي خوارزمية حلها لأنها تمثل ثغرة لانهائية:</p>
+
+        <div class="danger-box">
+            <h3 style="color:#991b1b; margin-top:0;">ما هي الدورة السالبة (Negative Cycle)؟</h3>
+            <p>تخيل بنكاً يمنحك عرضاً غريباً: إذا حولت فلوسك من البنك (1) إلى البنك (2) ثم أرجعتها، تكسب ربحاً إضافياً! فتقوم بالدوران حول هذين البنكين آلاف المرات لتجمع أرباحاً لا نهائية.</p>
+            <p>في الرسوم البيانية، إذا كانت هناك حلقة دوران مجموع أوزانها سالب، فإنك كلما درت فيها تنخفض المسافة إلى سالب مالانهاية \((-∞)\)!</p>
+            <p><strong>كيف تكتشفها بيلمان-فورد؟</strong></p>
+            <p>بعد إنهاء الـ \((V - 1)\) جولات الرسمية، تقوم الخوارزمية بـ <strong>جولة إضافية واحدة أخيرة</strong>: إذا وجدت أن أي مسافة لا تزال تنخفض، تصرخ الخوارزمية وتطلق تحذيراً: <em>"يوجد فخ دورة سالبة في الخريطة، المسار الأقصر غير معرف!"</em>.</p>
+        </div>
+    </div>
+
+    <!-- 5. كود الجافاسكريبت الموثق بالكامل -->
+    <div class="section-card">
+        <h2>5. تطبيق الخوارزمية بلغة JavaScript مع كشف الدورات السالبة</h2>
+        <p>لاحظ كيف نتعامل هنا مع قائمة بسيطة من الحواف (Edges Array) بدل المصفوفات المعقدة:</p>
+
+        <pre><code><span class="c-comment">// تعريف الحواف: من أين، إلى أين، وما هو الوزن</span>
+<span class="c-kw">const</span> edges = [
+    { from: <span class="c-nm">'A'</span>, to: <span class="c-nm">'B'</span>, weight: <span class="c-nm">4</span> },
+    { from: <span class="c-nm">'A'</span>, to: <span class="c-nm">'C'</span>, weight: <span class="c-nm">5</span> },
+    { from: <span class="c-nm">'B'</span>, to: <span class="c-nm">'C'</span>, weight: <span class="c-nm">-2</span> }, <span class="c-comment">// وزن سالب (خصم)</span>
+    { from: <span class="c-nm">'C'</span>, to: <span class="c-nm">'D'</span>, weight: <span class="c-nm">3</span> }
+];
+
+<span class="c-kw">const</span> nodes = [<span class="c-nm">'A'</span>, <span class="c-nm">'B'</span>, <span class="c-nm">'C'</span>, <span class="c-nm">'D'</span>];
+
+<span class="c-kw">function</span> <span class="c-fn">bellmanFord</span>(nodes, edges, startNode) {
+    <span class="c-kw">const</span> distances = {};
+    <span class="c-kw">const</span> previous = {};
+
+    <span class="c-comment">// 1. التهيئة: البداية 0 والباقي Infinity</span>
+    nodes.forEach(node => {
+        distances[node] = <span class="c-kw">Infinity</span>;
+        previous[node] = <span class="c-kw">null</span>;
+    });
+    distances[startNode] = <span class="c-nm">0</span>;
+
+    <span class="c-comment">// 2. تكرار الفحص الشامل (عدد العقد - 1) مرات</span>
+    <span class="c-kw">for</span> (<span class="c-kw">let</span> i = <span class="c-nm">1</span>; i &lt;= nodes.length - <span class="c-nm">1</span>; i++) {
+        edges.forEach(({ from, to, weight }) => {
+            <span class="c-kw">if</span> (distances[from] !== <span class="c-kw">Infinity</span> &amp;&amp; distances[from] + weight &lt; distances[to]) {
+                distances[to] = distances[from] + weight;
+                previous[to] = from;
+            }
+        });
+    }
+
+    <span class="c-comment">// 3. الجولة الإضافية لكشف الدورات السالبة (Negative Cycle Check)</span>
+    <span class="c-kw">for</span> (<span class="c-kw">let</span> { from, to, weight } <span class="c-kw">of</span> edges) {
+        <span class="c-kw">if</span> (distances[from] !== <span class="c-kw">Infinity</span> &amp;&amp; distances[from] + weight &lt; distances[to]) {
+            <span class="c-kw">throw new</span> Error(<span class="c-nm">"تحذير: تم اكتشاف دورة سالبة! أقصر مسار غير نهائي."</span>);
+        }
+    }
+
+    <span class="c-kw">return</span> { distances, previous };
+}
+
+<span class="c-kw">const</span> result = bellmanFord(nodes, edges, <span class="c-nm">'A'</span>);
+console.log(result.distances); <span class="c-comment">// { A: 0, B: 4, C: 2, D: 5 }</span></code></pre>
+    </div>
+
+    <!-- 6. مقارنة الختام بين العملاقين -->
+    <div class="section-card">
+        <h2>6. جدول الملخص: متى تختار ديكسترا ومتى تختار بيلمان-فورد؟</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>وجه المقارنة</th>
+                    <th>ديكسترا (Dijkstra)</th>
+                    <th>بيلمان-فورد (Bellman-Ford)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>فلسفة العمل</strong></td>
+                    <td>جشعة وسريعة (Greedy)</td>
+                    <td>شاملة ومتأنية (Dynamic Programming / Relaxation)</td>
+                </tr>
+                <tr>
+                    <td><strong>الأوزان السالبة</strong></td>
+                    <td>تفشل تماماً وتضلل النتائج</td>
+                    <td>تتعامل معها بكفاءة وتصل لأفضل حل</td>
+                </tr>
+                <tr>
+                    <td><strong>كشف الدورات السالبة</strong></td>
+                    <td>لا تستطيع</td>
+                    <td>تكشفها فوراً بالجولة الإضافية</td>
+                </tr>
+                <tr>
+                    <td><strong>السرعة والتعقيد</strong></td>
+                    <td>سريعة جداً: \(O((V + E) \log V)\)</td>
+                    <td>أبطأ نسبياً: \(O(V \times E)\)</td>
+                </tr>
+                <tr>
+                    <td><strong>القرار الهندسي</strong></td>
+                    <td>استخدمها دائماً إلا لو وُجدت أوزان سالبة</td>
+                    <td>استخدمها في الأنظمة المالية والشبكات ذات الخصومات</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    // خطوات المحاكاة البصرية لخوارزمية بيلمان-فورد
+    const bfSteps = [
+        {
+            round: "التهيئة",
+            text: "نضع مسافة العقدة A بصفر، وجميع العقد الأخرى ∞.",
+            dist: { A: 0, B: '∞', C: '∞', D: '∞' },
+            prev: { A: '—', B: '—', C: '—', D: '—' },
+            activeEdge: null,
+            relaxedEdge: null,
+            fromNode: null,
+            toNode: null
+        },
+        {
+            round: "الجولة 1: فحص A ➔ B",
+            text: "نفحص الحافة من A إلى B (وزنها 4). المسافة السابقة لـ B كانت ∞. نحسنها الآن إلى 4.",
+            dist: { A: 0, B: 4, C: '∞', D: '∞' },
+            prev: { A: '—', B: 'A', C: '—', D: '—' },
+            activeEdge: 'e-AB',
+            relaxedEdge: 'e-AB',
+            fromNode: 'A',
+            toNode: 'B'
+        },
+        {
+            round: "الجولة 1: فحص A ➔ C",
+            text: "نفحص الحافة المباشرة من A إلى C (وزنها 5). نحسن مسافة C من ∞ إلى 5 مبدئياً.",
+            dist: { A: 0, B: 4, C: 5, D: '∞' },
+            prev: { A: '—', B: 'A', C: 'A', D: '—' },
+            activeEdge: 'e-AC',
+            relaxedEdge: 'e-AC',
+            fromNode: 'A',
+            toNode: 'C'
+        },
+        {
+            round: "الجولة 2: فحص الكاش باك B ➔ C (-2)",
+            text: "هنا تتجلى قوة الخوارزمية! وصلنا لـ B بـ 4، وهناك وصلة لـ C بخصم (-2). المجموع: 4 + (-2) = 2. هذا أفضل بكثير من المسار المباشر القديم (5)! نحدث C لتصبح 2 وجئنا من B.",
+            dist: { A: 0, B: 4, C: 2, D: '∞' },
+            prev: { A: '—', B: 'A', C: 'B', D: '—' },
+            activeEdge: 'e-BC',
+            relaxedEdge: 'e-BC',
+            fromNode: 'B',
+            toNode: 'C'
+        },
+        {
+            round: "الجولة 2: فحص C ➔ D (+3)",
+            text: "بما أن مسافة C تحسنت وأصبحت 2 فقط، سننطلق منها إلى D بتكلفة 3. المسافة الإجمالية إلى D تصبح: 2 + 3 = 5!",
+            dist: { A: 0, B: 4, C: 2, D: 5 },
+            prev: { A: '—', B: 'A', C: 'B', D: 'C' },
+            activeEdge: 'e-CD',
+            relaxedEdge: 'e-CD',
+            fromNode: 'C',
+            toNode: 'D'
+        },
+        {
+            round: "الجولة 3 والأخيرة: استقرار الخريطة",
+            text: "تم إكمال الجولات الرسمية (V - 1 = 3). لم يتغير أي رقم، مما يعني أننا وصلنا لأقوى وأرخص مسارات ممكنة بدون أي دورات سالبة!",
+            dist: { A: 0, B: 4, C: 2, D: 5 },
+            prev: { A: '—', B: 'A', C: 'B', D: 'C' },
+            activeEdge: null,
+            relaxedEdge: null,
+            fromNode: null,
+            toNode: null
+        }
+    ];
+
+    let bfIndex = 0;
+
+    function renderBF() {
+        const step = bfSteps[bfIndex];
+
+        // تحديث الجدول
+        const tbody = document.getElementById('bf-table-body');
+        tbody.innerHTML = '';
+        ['A', 'B', 'C', 'D'].forEach(node => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${node}</strong></td>
+                <td><strong style="color: ${step.dist[node] !== '∞' ? '#4338ca' : '#94a3b8'}">${step.dist[node]}</strong></td>
+                <td>${step.prev[node]}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // نصوص الوصف
+        document.getElementById('bf-narrative').innerText = step.text;
+        document.getElementById('round-indicator').innerText = step.round;
+
+        // الرسوم والأنيميشن
+        document.querySelectorAll('.edge').forEach(e => e.classList.remove('evaluating', 'relaxed'));
+        document.querySelectorAll('.node-circle').forEach(c => c.classList.remove('from-node', 'to-node'));
+
+        if (step.activeEdge) {
+            const edgeEl = document.getElementById(step.activeEdge);
+            if (edgeEl) edgeEl.classList.add('evaluating');
+        }
+
+        if (step.fromNode) {
+            const f = document.getElementById('c-' + step.fromNode);
+            if (f) f.classList.add('from-node');
+        }
+
+        if (step.toNode) {
+            const t = document.getElementById('c-' + step.toNode);
+            if (t) t.classList.add('to-node');
+        }
+    }
+
+    function nextBFStep() {
+        if (bfIndex < bfSteps.length - 1) {
+            bfIndex++;
+            renderBF();
+        } else {
+            alert("اكتملت جولات خوارزمية بيلمان-فورد بنجاح ووصلنا للمسافات المثالية!");
+        }
+    }
+
+    function resetBFSim() {
+        bfIndex = 0;
+        renderBF();
+    }
+
+    renderBF();
+</script>
+
+</body>
+</html>

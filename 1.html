@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رحلة فهم خوارزمية ديكسترا - من الصفر تماماً</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Fira+Code:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-page: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --primary: #2563eb;
+            --primary-soft: #eff6ff;
+            --secondary: #0d9488;
+            --secondary-soft: #f0fdfa;
+            --warning: #d97706;
+            --warning-soft: #fffbeb;
+            --danger: #dc2626;
+            --danger-soft: #fef2f2;
+            --text-dark: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-body);
+            line-height: 1.9;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Hero Header */
+        header {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 40px 24px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.06);
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 2.3rem;
+            font-weight: 900;
+            margin-bottom: 12px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        /* Cards */
+        .section-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 28px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 20px 0 10px 0;
+        }
+
+        p {
+            margin-bottom: 14px;
+            font-size: 1.05rem;
+        }
+
+        /* Real Life Example Boxes */
+        .story-box {
+            background-color: #f8fafc;
+            border-right: 5px solid var(--primary);
+            padding: 18px 22px;
+            border-radius: 8px 14px 14px 8px;
+            margin: 16px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            border-left: 1px solid var(--border);
+        }
+
+        .story-badge {
+            background-color: var(--primary-soft);
+            color: var(--primary);
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .warning-box {
+            background-color: var(--danger-soft);
+            border-right: 5px solid var(--danger);
+            padding: 18px 22px;
+            border-radius: 8px 14px 14px 8px;
+            margin: 16px 0;
+            color: #7f1d1d;
+        }
+
+        /* Simulator Styles */
+        .sim-container {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 850px) {
+            .sim-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .canvas-wrapper {
+            background-color: #ffffff;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);
+            position: relative;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .controls-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background-color: #ffffff;
+            color: var(--text-dark);
+            border: 1.5px solid var(--border);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background-color: #f1f5f9;
+            transform: none;
+        }
+
+        /* Animation & Interactive Styles */
+        .edge {
+            stroke: #cbd5e1;
+            stroke-width: 4;
+            transition: stroke 0.4s ease, stroke-width 0.4s ease;
+        }
+
+        .edge.checking {
+            stroke: var(--warning);
+            stroke-width: 6;
+            stroke-dasharray: 8;
+            animation: dashMove 0.8s linear infinite;
+        }
+
+        .edge.selected-path {
+            stroke: var(--secondary);
+            stroke-width: 6;
+        }
+
+        @keyframes dashMove {
+            to { stroke-dashoffset: -16; }
+        }
+
+        .node-circle {
+            fill: #ffffff;
+            stroke: #94a3b8;
+            stroke-width: 3.5;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .node-circle.current-node {
+            fill: #fef08a;
+            stroke: var(--warning);
+            stroke-width: 5;
+            transform: scale(1.15);
+            transform-origin: center;
+            filter: drop-shadow(0 4px 10px rgba(217, 119, 6, 0.35));
+        }
+
+        .node-circle.visited-node {
+            fill: var(--secondary-soft);
+            stroke: var(--secondary);
+            stroke-width: 4;
+        }
+
+        .node-text {
+            fill: var(--text-dark);
+            font-weight: 800;
+            font-size: 17px;
+            text-anchor: middle;
+            dominant-baseline: central;
+            pointer-events: none;
+        }
+
+        .edge-label-bg {
+            fill: #ffffff;
+            stroke: #e2e8f0;
+            stroke-width: 1.5;
+        }
+
+        .edge-label-text {
+            fill: var(--text-dark);
+            font-size: 13px;
+            font-weight: 700;
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+
+        /* Live Table */
+        .table-panel {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 700;
+            padding: 10px 8px;
+            border-bottom: 2px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        td {
+            padding: 12px 8px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        .status-pill {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .pill-done { background-color: var(--secondary-soft); color: var(--secondary); }
+        .pill-wait { background-color: #f1f5f9; color: var(--text-muted); }
+
+        .live-narrative {
+            background-color: var(--primary-soft);
+            border: 1px solid #bfdbfe;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 14px;
+            font-size: 1rem;
+            color: #1e40af;
+            font-weight: 600;
+            min-height: 85px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Code Block */
+        pre {
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 20px;
+            border-radius: 14px;
+            overflow-x: auto;
+            direction: ltr;
+            text-align: left;
+            margin: 16px 0;
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+        .c-keyword { color: #f43f5e; font-weight: bold; }
+        .c-func { color: #38bdf8; }
+        .c-comment { color: #64748b; font-style: italic; }
+        .c-num { color: #fbbf24; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>فهم خوارزمية ديكسترا من الصفر تماماً</h1>
+        <p>دليل تعليمي يعتمد على القصص الواقعية، تفكيك كل المصطلحات المعقدة، والأنيميشن الحي خطوة بخطوة.</p>
+    </header>
+
+    <!-- الفصل 1: المشكلة من الواقع -->
+    <div class="section-card">
+        <h2>1. القصة الواقعية: ما هي المشكلة التي نحاول حلها؟</h2>
+        <p>تخيل أنك سائق في تطبيق مثل <strong>Google Maps</strong> أو <strong>Uber</strong>، وتريد التحرك من منزلك في الحي <strong>(A)</strong> لتوصيل طلب إلى الحي <strong>(D)</strong>.</p>
+        
+        <div class="story-box">
+            <span class="story-badge">مثال من واقعنا</span>
+            <p>أمامك طرق متعددة بين الأحياء:</p>
+            <ul>
+                <li>طريق سريع ومباشر، لكن فيه زحام ويستغرق <strong>11 دقيقة</strong>.</li>
+                <li>طريق يمر بحي وسيط هادئ، ويستغرق فقط <strong>5 دقائق</strong>.</li>
+            </ul>
+            <p>بدل أن تخمن بنفسك وتضيع وقتك في تجربة كل شوارع المدينة، نحتاج إلى عقل إلكتروني ذكي يجرب الطرق بأقل مجهود ويضمن لنا 100% أنه وجد <strong>أسرع مسار ممكن</strong>. هذا العقل الذكي هو بالضبط <strong>خوارزمية ديكسترا (Dijkstra)</strong>.</p>
+        </div>
+    </div>
+
+    <!-- الفصل 2: قاموس المصطلحات -->
+    <div class="section-card">
+        <h2>2. تفكيك المصطلحات الغريبة (افهم المعنى بدون تعقيد)</h2>
+        <p>في علوم الحاسوب، يستخدم المبرمجون كلمات إنجليزية قد تبدو مخيفة. دعنا نترجمها إلى لغة الحياة اليومية:</p>
+
+        <div class="story-box">
+            <span class="story-badge">مصطلح 1: الرسم البياني الموزون (Weighted Graph)</span>
+            <p><strong>ماذا يعني؟</strong> هو ببساطة خريطة الشوارع!</p>
+            <ul>
+                <li><strong>العقدة (Node أو Vertex):</strong> هي الميدان، أو الحي، أو المدينة (مكان تقف فيه).</li>
+                <li><strong>الحافة (Edge):</strong> هي الشارع أو الكوبري الذي يصل بين حيين.</li>
+                <li><strong>الوزن (Weight):</strong> التكلفة! قد يكون عدد الكيلومترات، أو زمن الرحلة بالدقائق، أو حتى ثمن تذكرة المواصلات.</li>
+            </ul>
+        </div>
+
+        <div class="story-box">
+            <span class="story-badge">مصطلح 2: التهدئة أو تحسين المسار (Relaxation)</span>
+            <p><strong>لماذا سميت Relaxation؟</strong> تخيل أنك متوتر لأنك تظن أن مشوارك سيكلفك 100 جنيه. فجأة اقترح عليك صديقك طريقاً مختصراً سيكلفك 30 جنيهاً فقط! ماذا حدث لتوترك؟ انخفض وشعرت بـ (الاسترخاء أو الهدوء)!</p>
+            <p>في البرمجة، كلمة <strong>Relaxation</strong> تعني شيئاً واحداً فقط: <em>"كلما وجدنا طريقاً أقصر لمدينة ما، نلغي الرقم القديم الغالي ونسجل الرقم الجديد الرخيص"</em>.</p>
+        </div>
+
+        <div class="story-box">
+            <span class="story-badge">مصطلح 3: الخوارزمية الجشعة الطماعة (Greedy Algorithm)</span>
+            <p><strong>هل هي صفة سيئة؟</strong> لا، بل أسلوب تفكير! الإنسان الجشع يريد المكسب المضمون تحت يديه الآن ولا يحب المخاطرة بالمستقبل.</p>
+            <p>وديكسترا تفكر هكذا: في كل خطوة، تنظر حولها وتسأل: <em>"من هي أقرب وأرخص مدينة متبقية أستطيع الوصول إليها حالياً؟ سأختارها فوراً وأعتبرها مضمونة نهائياً!"</em>.</p>
+        </div>
+
+        <div class="story-box">
+            <span class="story-badge">مصطلح 4: المالانهاية (Infinity / ∞)</span>
+            <p><strong>لماذا نضع مسافة كل المدن ∞ في البداية؟</strong></p>
+            <p>لأنك في أول ثانية وأنت واقف عند بيتك، لا تعرف بعد كم دقيقة تفصلك عن باقي المدن البعيدة. فتعطيها افتراضياً رقم ضخم جداً لا يمكن تجاوزه (∞)، لتقول: <em>"أي مسار حقيقي سأكتشفه لاحقاً -مهما كان طويلاً- سيكون حتماً أفضل من هذا المجهول الضخم"</em>.</p>
+        </div>
+    </div>
+
+    <!-- الفصل 3: المحاكي التفاعلي -->
+    <div class="section-card">
+        <h2>3. المحاكي التفاعلي: شاهد الخوارزمية وهي تفكر وتتحرك</h2>
+        <p>في هذا النموذج، نريد الانتقال من الحي <strong>(A)</strong> إلى الحي <strong>(D)</strong> بأقل زمن ممكن. اضغط على زر <strong>"الخطوة التالية"</strong>، وراقب كيف تنتقل الخوارزمية بين الأحياء وتحدث الجدول أمامك مباشرة:</p>
+
+        <div class="sim-container">
+            <!-- الرسم المتحرك -->
+            <div>
+                <div class="canvas-wrapper">
+                    <svg id="network-svg" viewBox="0 0 500 350">
+                        <!-- الخطوط بين المدن (Edges) -->
+                        <line id="edge-A-B" class="edge" x1="90" y1="175" x2="250" y2="70" />
+                        <line id="edge-A-C" class="edge" x1="90" y1="175" x2="250" y2="280" />
+                        <line id="edge-B-C" class="edge" x1="250" y1="70" x2="250" y2="280" />
+                        <line id="edge-B-D" class="edge" x1="250" y1="70" x2="410" y2="175" />
+                        <line id="edge-C-D" class="edge" x1="250" y1="280" x2="410" y2="175" />
+
+                        <!-- الأوزان (الوقت بالدقائق) -->
+                        <circle cx="165" cy="115" r="14" class="edge-label-bg" />
+                        <text x="165" y="115" class="edge-label-text">4 د</text>
+
+                        <circle cx="165" cy="235" r="14" class="edge-label-bg" />
+                        <text x="165" y="235" class="edge-label-text">2 د</text>
+
+                        <circle cx="250" cy="175" r="14" class="edge-label-bg" />
+                        <text x="250" y="175" class="edge-label-text">6 د</text>
+
+                        <circle cx="335" cy="115" r="14" class="edge-label-bg" />
+                        <text x="335" y="115" class="edge-label-text">7 د</text>
+
+                        <circle cx="335" cy="235" r="14" class="edge-label-bg" />
+                        <text x="335" y="235" class="edge-label-text">3 د</text>
+
+                        <!-- المدن (Nodes) -->
+                        <g id="node-group-A">
+                            <circle id="circle-A" class="node-circle" cx="90" cy="175" r="24" />
+                            <text class="node-text" x="90" y="175">A</text>
+                        </g>
+                        <g id="node-group-B">
+                            <circle id="circle-B" class="node-circle" cx="250" cy="70" r="24" />
+                            <text class="node-text" x="250" y="70">B</text>
+                        </g>
+                        <g id="node-group-C">
+                            <circle id="circle-C" class="node-circle" cx="250" cy="280" r="24" />
+                            <text class="node-text" x="250" y="280">C</text>
+                        </g>
+                        <g id="node-group-D">
+                            <circle id="circle-D" class="node-circle" cx="410" cy="175" r="24" />
+                            <text class="node-text" x="410" y="175">D</text>
+                        </g>
+                    </svg>
+                </div>
+
+                <div class="controls-bar">
+                    <button class="btn" onclick="nextStep()">الخطوة التالية ◀</button>
+                    <button class="btn btn-outline" onclick="resetSim()">إعادة الرحلة ↺</button>
+                </div>
+            </div>
+
+            <!-- جدول التتبع الحي -->
+            <div class="table-panel">
+                <h3 style="margin-top:0;">دفتر السائق (جدول المسافات)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الحي</th>
+                            <th>أقصر وقت</th>
+                            <th>جئنا من</th>
+                            <th>الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- يتم ملؤه تلقائياً -->
+                    </tbody>
+                </table>
+
+                <div class="live-narrative" id="narrative-box">
+                    اضغط على زر "الخطوة التالية" لنبدأ من الحي A.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- الفصل 4: الكود البرمجي المشروح -->
+    <div class="section-card">
+        <h2>4. الكود بلغة JavaScript (مع استرجاع المسار بالأسماء)</h2>
+        <p>دعنا نترجم هذا التفكير المنطقي إلى أسطر برمجية واضحة جداً:</p>
+
+        <pre><code><span class="c-comment">// 1. خريطة الشوارع والتكلفة بين الأحياء</span>
+<span class="c-keyword">const</span> cityMap = {
+    A: { B: <span class="c-num">4</span>, C: <span class="c-num">2</span> },
+    B: { A: <span class="c-num">4</span>, C: <span class="c-num">6</span>, D: <span class="c-num">7</span> },
+    C: { A: <span class="c-num">2</span>, B: <span class="c-num">6</span>, D: <span class="c-num">3</span> },
+    D: { B: <span class="c-num">7</span>, C: <span class="c-num">3</span> }
+};
+
+<span class="c-keyword">function</span> <span class="c-func">dijkstra</span>(map, startCity) {
+    <span class="c-keyword">const</span> shortestTimes = {};   <span class="c-comment">// أقل وقت للوصول لكل حي</span>
+    <span class="c-keyword">const</span> cameFrom = {};        <span class="c-comment">// الحي السابق (لمعرفة خط السير)</span>
+    <span class="c-keyword">const</span> visited = <span class="c-keyword">new</span> <span class="c-func">Set</span>();   <span class="c-comment">// الأحياء التي انتهينا من فحصها تماماً</span>
+
+    <span class="c-comment">// تهيئة كل الأحياء بوقت مجهول ضخم (Infinity) ما عدا نقطة البداية</span>
+    <span class="c-keyword">for</span> (<span class="c-keyword">let</span> city <span class="c-keyword">in</span> map) {
+        shortestTimes[city] = <span class="c-keyword">Infinity</span>;
+        cameFrom[city] = <span class="c-keyword">null</span>;
+    }
+    shortestTimes[startCity] = <span class="c-num">0</span>; <span class="c-comment">// وقت البداية من بيتك هو صفر دقيقة</span>
+
+    <span class="c-keyword">while</span> (visited.size &lt; Object.keys(map).length) {
+        <span class="c-comment">// خطوة الطمع (Greedy): ابحث عن أقرب حي لم نزره بعد</span>
+        <span class="c-keyword">let</span> current = <span class="c-keyword">null</span>;
+        <span class="c-keyword">for</span> (<span class="c-keyword">let</span> city <span class="c-keyword">in</span> shortestTimes) {
+            <span class="c-keyword">if</span> (!visited.has(city) &amp;&amp; (current === <span class="c-keyword">null</span> || shortestTimes[city] &lt; shortestTimes[current])) {
+                current = city;
+            }
+        }
+
+        <span class="c-keyword">if</span> (current === <span class="c-keyword">null</span> || shortestTimes[current] === <span class="c-keyword">Infinity</span>) <span class="c-keyword">break</span>;
+
+        <span class="c-comment">// الحي الحالي تم تثبيته ولن يتغير وقت وصوله</span>
+        visited.add(current);
+
+        <span class="c-comment">// خطوة الاسترخاء (Relaxation): فحص جيران هذا الحي</span>
+        <span class="c-keyword">for</span> (<span class="c-keyword">let</span> neighbor <span class="c-keyword">in</span> map[current]) {
+            <span class="c-keyword">if</span> (visited.has(neighbor)) <span class="c-keyword">continue</span>;
+
+            <span class="c-keyword">const</span> tripTime = map[current][neighbor];
+            <span class="c-keyword">const</span> newTotalTime = shortestTimes[current] + tripTime;
+
+            <span class="c-comment">// إذا وجدنا طريقاً أسرع مما كنا نعرف، نقوم بتحديث الدفتر فوراً</span>
+            <span class="c-keyword">if</span> (newTotalTime &lt; shortestTimes[neighbor]) {
+                shortestTimes[neighbor] = newTotalTime;
+                cameFrom[neighbor] = current; <span class="c-comment">// نسجل: "وصلنا للجار عبر هذا الحي"</span>
+            }
+        }
+    }
+
+    <span class="c-keyword">return</span> { shortestTimes, cameFrom };
+}
+
+<span class="c-comment">// دالة رسم خط السير بالأسهم:</span>
+<span class="c-keyword">function</span> <span class="c-func">showRoute</span>(cameFrom, destination) {
+    <span class="c-keyword">const</span> route = [];
+    <span class="c-keyword">let</span> step = destination;
+    <span class="c-keyword">while</span> (step) {
+        route.unshift(step);
+        step = cameFrom[step];
+    }
+    <span class="c-keyword">return</span> route.join(<span class="c-num">" ➔ "</span>);
+}
+
+<span class="c-keyword">const</span> result = dijkstra(cityMap, <span class="c-num">"A"</span>);
+console.log(result.shortestTimes); <span class="c-comment">// { A: 0, B: 4, C: 2, D: 5 }</span>
+console.log(showRoute(result.cameFrom, <span class="c-num">"D"</span>)); <span class="c-comment">// A ➔ C ➔ D</span></code></pre>
+    </div>
+
+    <!-- الفصل 5: لماذا تفشل ديكسترا مع الأوزان السالبة؟ -->
+    <div class="section-card">
+        <h2>5. لغز الأوزان السالبة: لماذا تغلق الخوارزمية عينيها عنها؟</h2>
+        <p>ماذا لو كان هناك شارع فيه (وزن سالب)؟ في الواقع، الوزن السالب يشبه <strong>"كوبون خصم"</strong> أو <strong>"كاش باك"</strong> يقلل التكلفة الإجمالية كلما مررت به.</p>
+        
+        <div class="warning-box">
+            <h3 style="color:#991b1b; margin-top:0;">لماذا تنخدع ديكسترا؟</h3>
+            <p>تذكر أن ديكسترا خوارزمية جشعة مستعجلة، مبدأها الأساسي: <em>"المدينة التي انتهيت منها وقررت أنها الأقصر، أضع عليها ختم (تمت الزيارة) ومستحيل أن أعود لأفكر فيها مرة ثانية"</em>.</p>
+            <p><strong>تخيل هذا الموقف:</strong></p>
+            <ul>
+                <li>طريق مباشر من A إلى B يكلفك <strong>3 جنيهات</strong>. تختاره ديكسترا وتغلق ملف B للأبد.</li>
+                <li>طريق آخر طويل من A إلى C يكلفك <strong>10 جنيهات</strong>.</li>
+                <li>لكن هناك كوبري من C إلى B يعطيك كاش باك <strong>-9 جنيهات</strong>! يعني لو ذهبت عبر C، ستصبح التكلفة الإجمالية للوصول إلى B: \(10 - 9 = 1\) جنيه فقط (أرخص بكثير من 3)!</li>
+            </ul>
+            <p>ديكسترا <strong>لن تكتشف ذلك أبداً</strong> لأنها أغلقت ملف B مبكراً وافترضت بسذاجة أن التكاليف في الدنيا كلها تزيد ولا تنقص. لذلك في الشوارع التي تحتوي على أوزان سالبة، لا نستخدم ديكسترا أبداً، بل نستخدم خوارزمية أخرى اسمها <strong>Bellman-Ford</strong>.</p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // الخطوات المشروحة بأسلوب قصصي
+    const steps = [
+        {
+            title: "البداية: في بيتنا (A)",
+            desc: "أنت الآن تقف في الحي A. الوقت للوصول إلى نفسك = 0 دقيقة. باقي الأحياء لا نعرف طريقها بعد، لذلك سجلنا وقتها ∞ (مجهول).",
+            table: [
+                { city: 'A', time: '0 د', from: 'البداية', visited: false },
+                { city: 'B', time: '∞', from: '—', visited: false },
+                { city: 'C', time: '∞', from: '—', visited: false },
+                { city: 'D', time: '∞', from: '—', visited: false }
+            ],
+            current: null,
+            visitedNodes: [],
+            activeEdges: [],
+            finalEdges: []
+        },
+        {
+            title: "الخطوة 1: فحص شوارع الحي A",
+            desc: "نحن في A (الوقت 0). ننظر حولنا: نستطيع الذهاب إلى B في 4 دقائق، وإلى C في دقيقتين فقط. نحدث الدفتر فوراً بأوقات هذه الطرق الجديدة.",
+            table: [
+                { city: 'A', time: '0 د', from: 'البداية', visited: true },
+                { city: 'B', time: '4 د', from: 'A', visited: false },
+                { city: 'C', time: '2 د', from: 'A', visited: false },
+                { city: 'D', time: '∞', from: '—', visited: false }
+            ],
+            current: 'A',
+            visitedNodes: ['A'],
+            activeEdges: ['edge-A-B', 'edge-A-C'],
+            finalEdges: []
+        },
+        {
+            title: "الخطوة 2: الطمع في C لأنها الأقرب (2 دقيقة فقط)",
+            desc: "نقارن بين الباقي: C تأخذ دقيقتين و B تأخذ 4 دقائق. نختار C فوراً! من C نستطيع الوصول إلى D في 3 دقائق، إذن الوقت الكلي إلى D هو 2 + 3 = 5 دقائق (أفضل بكثير من ∞).",
+            table: [
+                { city: 'A', time: '0 د', from: 'البداية', visited: true },
+                { city: 'B', time: '4 د', from: 'A', visited: false },
+                { city: 'C', time: '2 د', from: 'A', visited: true },
+                { city: 'D', time: '5 د', from: 'C', visited: false }
+            ],
+            current: 'C',
+            visitedNodes: ['A', 'C'],
+            activeEdges: ['edge-C-D'],
+            finalEdges: ['edge-A-C']
+        },
+        {
+            title: "الخطوة 3: فحص الحي B",
+            desc: "الدور على الحي B (وقتها 4 دقائق). لو حاولنا الوصول إلى D من خلال B، ستكون التكلفة: 4 + 7 = 11 دقيقة! هذا طريق بطيء جداً، لذلك نرفضه ونحافظ على طريقنا السابق عبر C (الذي يستغرق 5 دقائق فقط).",
+            table: [
+                { city: 'A', time: '0 د', from: 'البداية', visited: true },
+                { city: 'B', time: '4 د', from: 'A', visited: true },
+                { city: 'C', time: '2 د', from: 'A', visited: true },
+                { city: 'D', time: '5 د', from: 'C', visited: false }
+            ],
+            current: 'B',
+            visitedNodes: ['A', 'C', 'B'],
+            activeEdges: ['edge-B-D'],
+            finalEdges: ['edge-A-C', 'edge-A-B']
+        },
+        {
+            title: "الخطوة 4: الوصول للهدف D وإعلان الفائز!",
+            desc: "وصلنا للحي D بأقصر وقت ممكن وهو (5 دقائق). والمسار الفائز المكتوب في دفترنا هو: نبدأ من A ➔ نمر عبر C ➔ نصل إلى D.",
+            table: [
+                { city: 'A', time: '0 د', from: 'البداية', visited: true },
+                { city: 'B', time: '4 د', from: 'A', visited: true },
+                { city: 'C', time: '2 د', from: 'A', visited: true },
+                { city: 'D', time: '5 د', from: 'C', visited: true }
+            ],
+            current: 'D',
+            visitedNodes: ['A', 'C', 'B', 'D'],
+            activeEdges: [],
+            finalEdges: ['edge-A-C', 'edge-C-D']
+        }
+    ];
+
+    let currentStepIndex = 0;
+
+    function renderUI() {
+        const step = steps[currentStepIndex];
+
+        // 1. تحديث الجدول
+        const tbody = document.getElementById('table-body');
+        tbody.innerHTML = '';
+        step.table.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${row.city}</strong></td>
+                <td><strong style="color: ${row.time !== '∞' ? '#2563eb' : '#94a3b8'}">${row.time}</strong></td>
+                <td>${row.from}</td>
+                <td>${row.visited ? '<span class="status-pill pill-done">تم التثبيت ✓</span>' : '<span class="status-pill pill-wait">قيد الفحص</span>'}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // 2. تحديث نص القصة
+        document.getElementById('narrative-box').innerHTML = `<div><strong>${step.title}</strong><br>${step.desc}</div>`;
+
+        // 3. تحديث الرسم والأنيميشن
+        document.querySelectorAll('.node-circle').forEach(c => {
+            c.classList.remove('current-node', 'visited-node');
+        });
+        document.querySelectorAll('.edge').forEach(e => {
+            e.classList.remove('checking', 'selected-path');
+        });
+
+        // تلوين الأحياء التي تمت زيارتها
+        step.visitedNodes.forEach(id => {
+            const circle = document.getElementById('circle-' + id);
+            if (circle) circle.classList.add('visited-node');
+        });
+
+        // تلوين الحي الذي نقف عنده حالياً ونفحصه
+        if (step.current) {
+            const currentCircle = document.getElementById('circle-' + step.current);
+            if (currentCircle) {
+                currentCircle.classList.remove('visited-node');
+                currentCircle.classList.add('current-node');
+            }
+        }
+
+        // تحريك الطرق الجاري فحصها (خطوط متقطعة متحركة)
+        step.activeEdges.forEach(edgeId => {
+            const edge = document.getElementById(edgeId);
+            if (edge) edge.classList.add('checking');
+        });
+
+        // تلوين المسار الأخضر المعتمد
+        step.finalEdges.forEach(edgeId => {
+            const edge = document.getElementById(edgeId);
+            if (edge) {
+                edge.classList.remove('checking');
+                edge.classList.add('selected-path');
+            }
+        });
+    }
+
+    function nextStep() {
+        if (currentStepIndex < steps.length - 1) {
+            currentStepIndex++;
+            renderUI();
+        } else {
+            alert("وصلت لطلبك بأسرع وقت ممكن! انتهت رحلة ديكسترا بنجاح.");
+        }
+    }
+
+    function resetSim() {
+        currentStepIndex = 0;
+        renderUI();
+    }
+
+    // تشغيل العرض الأولي فور فتح الملف
+    renderUI();
+</script>
+
+</body>
+</html>
