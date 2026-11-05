@@ -1031,20 +1031,13 @@
         return true;
       });
 
-      // ضمان ظهور الملفات دائماً في الشاشة الرئيسية: إذا كانت كل الملفات داخل فولدرات ولم يبق ملف خارجها، نعرض جميع الملفات بالأسفل أيضاً حتى لا تبدو الصفحة فارغة أبداً
-      let showingAllFallbackAtRoot = false;
-      if (filteredLessons.length === 0 && activeFolderId === "ROOT" && !searchVal && effectiveFolderFilter === "ALL" && visibleLessons.length > 0) {
-        filteredLessons = [...visibleLessons];
-        showingAllFallbackAtRoot = true;
-      }
-
       const lessonsSection = document.getElementById("lessonsSection");
       if (activeFolderId !== "ROOT" && folders.length > 0) {
         const fObj = folders.find(f => String(f.id) === String(activeFolderId));
         lessonsSectionTitle.innerHTML = `<span>📚</span><span>الدروس المتاحة داخل ${fObj ? fObj.name : "الفولدر"}</span>`;
       } else if (searchVal) {
         lessonsSectionTitle.innerHTML = `<span>🔍</span><span>نتائج البحث (${filteredLessons.length})</span>`;
-      } else if ((effectiveFolderFilter === "ALL_FLAT" || showingAllFallbackAtRoot) && folders.length > 0) {
+      } else if (effectiveFolderFilter === "ALL_FLAT" && folders.length > 0) {
         lessonsSectionTitle.innerHTML = `<span>📚</span><span>جميع الدروس والملفات المتاحة</span>`;
       } else if (folders.length > 0) {
         lessonsSectionTitle.innerHTML = `<span>📄</span><span>ملفات عامة (خارج الفولدرات)</span>`;
@@ -1082,6 +1075,12 @@
       lessonsGrid.innerHTML = "";
 
       if (filteredLessons.length === 0) {
+        // إذا كنا في الشاشة الرئيسية وهناك فولدرات وكل الملفات تم نقلها داخل الفولدرات، نخفي قسم الملفات الخارجية تماماً لتظهر الفولدرات فقط
+        if (activeFolderId === "ROOT" && !searchVal && effectiveFolderFilter === "ALL" && folders.length > 0 && visibleLessons.length > 0) {
+          lessonsSection.classList.add("hidden");
+          emptyState.classList.add("hidden");
+          return;
+        }
         lessonsSection.classList.remove("hidden");
         emptyState.classList.remove("hidden");
         if (emptyBackRootBtn) {
